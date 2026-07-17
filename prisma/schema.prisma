@@ -1,0 +1,193 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
+}
+
+model AdminUser {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String   @default("Admin")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id          String          @id @default(cuid())
+  name        String
+  brand       String
+  category    String
+  price       Int
+  originalPrice Int
+  material    String
+  sku         String          @unique
+  tag         String?
+  active      Boolean         @default(true)
+  position    Int             @default(0)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  variants    ProductVariant[]
+  images      ProductImage[]
+
+  @@index([position, createdAt])
+}
+
+model ProductVariant {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  size      String
+  color     String
+  colorHex  String
+  stock     Int      @default(0)
+  @@unique([productId, size, color])
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  alt       String?
+  order     Int     @default(0)
+
+  @@index([productId])
+}
+
+model Order {
+  id           String      @id
+  name         String
+  phone        String
+  wilaya       String
+  commune      String
+  address      String
+  notes        String?
+  deliveryType String
+  subtotal     Int
+  shippingCost Int
+  total        Int
+  status       String      @default("pending")
+  procolisId   String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  items        OrderItem[]
+
+  @@index([createdAt])
+  @@index([status])
+}
+
+model OrderItem {
+  id        String @id @default(cuid())
+  orderId   String
+  order     Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  productName String
+  brand     String
+  size      String
+  color     String
+  price     Int
+  quantity  Int
+}
+
+model ShippingRate {
+  id         String @id @default(cuid())
+  wilaya     String @unique
+  wilayaCode Int
+  homePrice  Int
+  stopPrice  Int
+  days       String
+}
+
+model Faq {
+  id        String   @id @default(cuid())
+  order     Int      @default(0)
+  questionFr String
+  questionAr String
+  questionEn String
+  answerFr   String
+  answerAr   String
+  answerEn   String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model WhyUsItem {
+  id         String   @id @default(cuid())
+  order      Int      @default(0)
+  icon       String   @default("check")
+  headingFr  String
+  headingAr  String
+  headingEn  String
+  paragraphFr String
+  paragraphAr String
+  paragraphEn String
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model BrandItem {
+  id        String   @id @default(cuid())
+  name      String
+  hot       Boolean  @default(false)
+  active    Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model CategoryContent {
+  id        String   @id @default(cuid())
+  nameFr    String
+  nameAr    String
+  nameEn    String
+  slug      String   @unique
+  imageUrl  String?  // optional image for the category tile
+  active    Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model FooterLink {
+  id       String   @id @default(cuid())
+  section  String
+  labelFr  String
+  labelAr  String
+  labelEn  String
+  url      String
+  order    Int      @default(0)
+  active   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model HomeSlide {
+  id            String   @id @default(cuid())
+  section       String   // "new_arrival" | "promotion"
+  title         String   @default("Nouveautés")
+  subtitle      String   @default("")
+  price         Int      @default(0)
+  originalPrice Int      @default(0)
+  imageUrls     String   @default("[]") // JSON array of image URLs
+  productId     String?  // optional link to a Product
+  linkUrl       String?  // custom link
+  autoRotate    Boolean  @default(true)
+  rotationSpeed Int      @default(4000) // milliseconds
+  active        Boolean  @default(true)
+  position      Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model LandingSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   // JSON value
+  updatedAt DateTime @updatedAt
+}
