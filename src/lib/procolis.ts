@@ -36,6 +36,7 @@ export async function createProcolisShipment(data: {
   }
 
   // ZR Express / Procolis uses specific wilaya IDs - need mapping
+  // 11 new wilayas (Law n°26-06, 2026) NOT added — confirm codes with ZR Express first
   const WILAYA_CODE_MAP: Record<string, number> = {
     "Adrar": 1, "Chlef": 2, "Laghouat": 3, "Oum El Bouaghi": 4,
     "Batna": 5, "Béjaïa": 6, "Biskra": 7, "Béchar": 8, "Blida": 9,

@@ -22,7 +22,7 @@ interface LandingSettings {
 
 const DEFAULT_SETTINGS: LandingSettings = {
   promo_text: "Promos",
-  hero_eyebrow: "DROP EN COURS — 58 WILAYAS",
+  hero_eyebrow: "DROP EN COURS — 69 WILAYAS",
   hero_title: "LIKE IT. WANT IT. COP IT.",
   hero_subtitle: "Sneakers et streetwear 100% originaux",
   hero_visual_img: "",

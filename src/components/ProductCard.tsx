@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, useState } from "react";
+import { optimizeCldUrl } from "@/lib/cloudinary";
 
 export interface ProductData {
   id: string;
@@ -70,7 +71,7 @@ export default memo(function ProductCard({ product, onClick }: { product: Produc
       <div className="pcard-img" style={img ? {} : { "--sw1": sw1, "--sw2": sw2 } as React.CSSProperties}>
         {product.tag && <div className="pcard-tag">{product.tag}</div>}
         {img && !imgErr ? (
-          <img src={img} alt={product.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={() => setImgErr(true)} />
+          <img src={optimizeCldUrl(img, { w: 400 })} alt={product.name} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={() => setImgErr(true)} />
         ) : (
           <ProductIcon category={product.category} />
         )}

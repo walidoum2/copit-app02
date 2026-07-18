@@ -4,7 +4,7 @@ import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   title: "COP IT — Sneakers & Streetwear, Algérie",
-  description: "Sneakers et streetwear 100% originaux, livrés dans les 58 wilayas. Paiement à la livraison.",
+  description: "Sneakers et streetwear 100% originaux, livrés dans les 69 wilayas. Paiement à la livraison.",
   icons: { icon: "/favicon.ico" },
 };
 

@@ -62,6 +62,18 @@ const WILAYAS = [
   { name: "Djanet", code: 56, tier: 3 },
   { name: "El M'Ghair", code: 57, tier: 3 },
   { name: "El Meniaa", code: 58, tier: 3 },
+  // 11 new wilayas (Law n°26-06, April 2026) — ZR Express codes unconfirmed
+  { name: "Aflou", code: 59, tier: 3 },
+  { name: "Barika", code: 60, tier: 3 },
+  { name: "Ksar Chellala", code: 61, tier: 3 },
+  { name: "Messaad", code: 62, tier: 3 },
+  { name: "Aïn Oussara", code: 63, tier: 3 },
+  { name: "Bou Saâda", code: 64, tier: 3 },
+  { name: "El Abiodh Sidi Cheikh", code: 65, tier: 3 },
+  { name: "El Kantara", code: 66, tier: 3 },
+  { name: "Bir El Ater", code: 67, tier: 3 },
+  { name: "Ksar El Boukhari", code: 68, tier: 3 },
+  { name: "El Aricha", code: 69, tier: 3 },
 ];
 
 function defaultRates(tier) {

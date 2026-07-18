@@ -8,6 +8,7 @@ import ProductModal from "@/components/ProductModal";
 import ProductCard, { type ProductData } from "@/components/ProductCard";
 import { useLang } from "@/contexts/LangContext";
 import { FAQ_DATA } from "@/data/dictionary";
+import { optimizeCldUrl } from "@/lib/cloudinary";
 
 function money(n: number) { return n.toLocaleString("fr-FR") + " DA"; }
 
@@ -18,7 +19,7 @@ function HeroSection({ settings }: { settings: Record<string, string> }) {
     <section className="hero">
       <div className="wrap hero-grid">
         <div>
-          <div className="eyebrow">{S("hero_eyebrow", "DROP EN COURS — 58 WILAYAS")}</div>
+          <div className="eyebrow">{S("hero_eyebrow", "DROP EN COURS — 69 WILAYAS")}</div>
           <h1 className="display" style={{ marginTop: 12, fontSize: "clamp(36px, 5vw, 72px)" }}>{S("hero_title", "LIKE IT. WANT IT. COP IT.")}</h1>
           <p className="lead" style={{ fontSize: 14, marginTop: 14 }}>{t("hero_policy")}</p>
           <div className="hero-cta">
@@ -36,7 +37,7 @@ function HeroSection({ settings }: { settings: Record<string, string> }) {
         </div>
         <div className="hero-visual">
           {S("hero_visual_img", "") ? (
-            <img src={S("hero_visual_img", "")} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            <img src={optimizeCldUrl(S("hero_visual_img", ""), { w: 800 })} alt="" fetchPriority="high" loading="eager" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           ) : (
             <svg viewBox="0 0 200 130" width="72%" fill="none" stroke="#F3F0E9" strokeWidth="1.4">
               <path d="M10 95c0-8 8-14 18-16 12-2 20-10 30-14 14-6 30-6 42 2 6 4 10 4 18 2 14-4 30 0 42 10 8 6 12 8 20 8 6 0 8 4 8 8v8c0 4-3 7-7 7H17c-4 0-7-3-7-7v-8z" />
@@ -88,7 +89,7 @@ function Categories({ categories: dbCats, lang, t }: { categories: CatItem[]; la
       <div className="cat-grid">
         {cats.map((cat) => (
           <a key={cat.slug} href={`/shop?category=${encodeURIComponent(cat.slug)}`} className="cat-card" style={cat.imageUrl ? { position: "relative", overflow: "hidden" } : {}}>
-            {cat.imageUrl && <img src={cat.imageUrl} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />}
+            {cat.imageUrl && <img src={optimizeCldUrl(cat.imageUrl, { w: 400 })} alt="" loading="lazy" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />}
             <div style={cat.imageUrl ? { position: "relative", zIndex: 1, background: "rgba(0,0,0,0.45)", padding: 20, borderRadius: "var(--radius)" } : {}}>
               <h3>{cat[nameKey]}</h3>
             </div>
@@ -102,13 +103,20 @@ function Categories({ categories: dbCats, lang, t }: { categories: CatItem[]; la
 /* ===== AUTO-ROTATING SLIDE CAROUSEL ===== */
 function SlideCarousel({ slide, speed = 3000 }: { slide: SlideItem; speed?: number }) {
   const [imgIdx, setImgIdx] = useState(0);
+  const [prevIdx, setPrevIdx] = useState<number | null>(null);
   const [paused, setPaused] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   let images: string[] = [];
   try { images = JSON.parse(slide.imageUrls || "[]"); } catch {}
 
-  function next() { setImgIdx(prev => (prev + 1) % images.length); }
-  function prev() { setImgIdx(prev => (prev - 1 + images.length) % images.length); }
+  function changeIdx(idx: number) {
+    setPrevIdx(imgIdx);
+    setImgIdx(idx);
+    setTimeout(() => setPrevIdx(null), 500);
+  }
+
+  function next() { changeIdx((imgIdx + 1) % images.length); }
+  function prev() { changeIdx((imgIdx - 1 + images.length) % images.length); }
 
   useEffect(() => {
     if (images.length <= 1 || paused || !slide.autoRotate) return;
@@ -116,11 +124,18 @@ function SlideCarousel({ slide, speed = 3000 }: { slide: SlideItem; speed?: numb
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [slide.id, images.length, speed, paused, slide.autoRotate]);
 
+  const imgStyle: React.CSSProperties = { position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", transition: "opacity 0.5s ease" };
+
   return (
     <div className="slide-carousel" style={{ position: "relative", width: "100%", aspectRatio: "1/1", overflow: "hidden", borderRadius: "var(--radius)", background: "var(--bg2)" }}
       onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
       {images.length > 0 ? (
-        <img src={images[imgIdx]} alt={slide.title} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "opacity 0.4s ease" }} />
+        <>
+          {prevIdx !== null && (
+            <img key={`prev-${prevIdx}`} src={optimizeCldUrl(images[prevIdx], { w: 600 })} alt="" style={{ ...imgStyle, opacity: 0, zIndex: 1 }} />
+          )}
+          <img key={`cur-${imgIdx}`} src={optimizeCldUrl(images[imgIdx], { w: 600 })} alt={slide.title} loading="lazy" style={{ ...imgStyle, opacity: 1, zIndex: 2 }} />
+        </>
       ) : (
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "var(--steel)", fontSize: 13 }}>{slide.title}</div>
       )}
