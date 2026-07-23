@@ -18,8 +18,8 @@ const FALLBACK_LINKS: Record<string, FooterLink[]> = {
     { section: "help", labelFr: "Contact WhatsApp", labelAr: "تواصل واتساب", labelEn: "WhatsApp contact", url: "https://wa.me/213562829805" },
   ],
   legal: [
-    { section: "legal", labelFr: "Confidentialité", labelAr: "الخصوصية", labelEn: "Privacy", url: "#" },
-    { section: "legal", labelFr: "Conditions", labelAr: "الشروط", labelEn: "Terms", url: "#" },
+    { section: "legal", labelFr: "Confidentialité", labelAr: "الخصوصية", labelEn: "Privacy", url: "/confidentialite" },
+    { section: "legal", labelFr: "Conditions", labelAr: "الشروط", labelEn: "Terms", url: "/conditions" },
   ],
 };
 

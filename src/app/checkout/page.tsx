@@ -9,12 +9,15 @@ import { WILAYAS, COMMUNES, FREE_SHIP_THRESHOLD } from "@/data/dictionary";
 
 function money(n: number) { return n.toLocaleString("fr-FR") + " DA"; }
 
+interface ConfirmedOrder { id: string; items: { name: string; size: string; quantity: number; price: number }[]; total: number; }
+
 export default function CheckoutPage() {
   const { items, subtotal, clearCart } = useCart();
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const [loading, setLoading] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
   const [dtype, setDtype] = useState<"home" | "stopdesk">("home");
+  const [confirmedOrder, setConfirmedOrder] = useState<ConfirmedOrder | null>(null);
 
   // Form state
   const [name, setName] = useState("");
@@ -94,9 +97,12 @@ export default function CheckoutPage() {
 
       const data = await res.json();
       if (data.success) {
+        setConfirmedOrder({
+          id: data.orderId,
+          items: items.map(i => ({ name: i.name, size: i.size || "", quantity: i.quantity, price: i.price })),
+          total,
+        });
         clearCart();
-        setToastMsg(t("order_confirmed").replace("{id}", data.orderId));
-        setTimeout(() => setToastMsg(""), 3000);
       } else {
         setToastMsg(data.error || t("order_failed"));
         setTimeout(() => setToastMsg(""), 3000);
@@ -106,6 +112,56 @@ export default function CheckoutPage() {
       setTimeout(() => setToastMsg(""), 3000);
     }
     setLoading(false);
+  }
+
+  if (confirmedOrder) {
+    return (
+      <>
+        <Header onCartOpen={() => {}} />
+        <div className="wrap" style={{ padding: "80px 0 100px", maxWidth: 580, margin: "0 auto", textAlign: "center" }}>
+          <div style={{ width: 64, height: 64, borderRadius: "50%", background: "var(--bg2)", border: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" }}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--cop)" strokeWidth="2" style={{ width: 28, height: 28 }}><path d="M20 6L9 17l-5-5" /></svg>
+          </div>
+          <h1 className="display" style={{ fontSize: "clamp(28px, 5vw, 40px)", textTransform: "uppercase" }}>
+            {lang === "ar" ? "تم تأكيد طلبيتك!" : "Commande confirmée !"}
+          </h1>
+          <p className="mono" style={{ fontSize: 14, color: "var(--cop)", marginTop: 10 }}>
+            {lang === "ar" ? `رقم الطلبية: ${confirmedOrder.id}` : `Réf: ${confirmedOrder.id}`}
+          </p>
+          <p style={{ fontSize: 14.5, color: "var(--steel)", marginTop: 18, lineHeight: 1.7, maxWidth: 420, margin: "18px auto 0" }}>
+            {lang === "ar"
+              ? "نتصل بك قريبًا لتأكيد التفاصيل. التوصيل في غضون 2 إلى 5 أيام حسب ولايتك."
+              : "Nous te contactons sous peu pour confirmer les détails. Livraison sous 2 à 5 jours selon ta wilaya."}
+          </p>
+
+          <div style={{ background: "var(--bg2)", border: "1px solid var(--line)", borderRadius: 2, padding: 24, marginTop: 34, textAlign: "left" }}>
+            <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              {lang === "ar" ? "ملخص الطلبية" : "Résumé de la commande"}
+            </h3>
+            {confirmedOrder.items.map((item, i) => (
+              <div key={i} className="sum-row" style={{ padding: "8px 0", borderBottom: i < confirmedOrder.items.length - 1 ? "1px solid var(--line)" : "none" }}>
+                <span style={{ fontSize: 13.5 }}>{item.quantity}× {item.name}{item.size ? ` (${item.size})` : ""}</span>
+                <span className="mono" style={{ fontSize: 13 }}>{money(item.price * item.quantity)}</span>
+              </div>
+            ))}
+            <div className="sum-row total" style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid var(--line)" }}>
+              <span style={{ fontWeight: 700 }}>{lang === "ar" ? "المجموع" : "Total"}</span>
+              <span className="mono" style={{ fontWeight: 700 }}>{money(confirmedOrder.total)}</span>
+            </div>
+          </div>
+
+          <div style={{ marginTop: 30, display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+            <a href="https://wa.me/213562829805" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: 12, textDecoration: "none" }}>
+              {lang === "ar" ? "اتصل بنا على واتساب" : "Nous contacter sur WhatsApp"}
+            </a>
+            <a href="/track" className="btn btn-primary" style={{ fontSize: 12, textDecoration: "none" }}>
+              {lang === "ar" ? "تتبع طلبيتك" : "Suivre ma commande"}
+            </a>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
   }
 
   return (
