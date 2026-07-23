@@ -8,10 +8,10 @@ export default function NotFound() {
 
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 40, textAlign: "center" }}>
-      <div className="mono" style={{ fontSize: 80, fontWeight: 700, color: "var(--cop)", lineHeight: 1 }}>
+      <div className="text-price" style={{ fontSize: 80, color: "var(--cop-dim)", lineHeight: 1 }}>
         404
       </div>
-      <h1 className="display" style={{ fontSize: "clamp(28px, 5vw, 44px)", marginTop: 16, textTransform: "uppercase" }}>
+      <h1 className="text-heading" style={{ fontSize: "clamp(28px, 5vw, 44px)" }}>
         {lang === "ar" ? "الصفحة غير موجودة" : "Page introuvable"}
       </h1>
       <p style={{ color: "var(--steel)", fontSize: 15, marginTop: 10, maxWidth: 400, lineHeight: 1.6 }}>

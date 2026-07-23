@@ -19,34 +19,34 @@ function HeroSection({ settings }: { settings: Record<string, string> }) {
     <section className="hero">
       <div className="wrap hero-grid">
         <div>
-          <div className="eyebrow">{S("hero_eyebrow", "DROP EN COURS — 69 WILAYAS")}</div>
-          <h1 className="text-display" style={{ marginTop: 12 }}>{S("hero_title", "LIKE IT. WANT IT. COP IT.")}</h1>
-          <p className="hero-policy">{t("hero_policy")}</p>
-          <div className="hero-cta">
+          <div className="hero-eyebrow">{S("hero_eyebrow", "DROP EN COURS — 69 WILAYAS")}</div>
+          <h1 className="hero-title">{S("hero_title", "LIKE IT. WANT IT. COP IT.")}</h1>
+          <p className="hero-body">{t("hero_policy")}</p>
+          <div className="hero-actions">
             <a href="/shop?promo=true" className="btn btn-primary">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ width: 16, height: 16 }}><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ width: 14, height: 14 }}><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
               {t("promo_btn")}
             </a>
             <a href="/shop" className="btn btn-outline">{t("hero_cta1")}</a>
           </div>
-          <div className="hero-badges">
-            <div className="hero-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 6L9 17l-5-5" /></svg><span>{t("badge1")}</span></div>
-            <div className="hero-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="3" width="15" height="13" /><path d="M16 8h4l3 3v5h-7V8z" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" /></svg><span>{t("badge2")}</span></div>
-            <div className="hero-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg><span>{t("badge3")}</span></div>
+          <div className="hero-trust">
+            <div className="hero-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 6L9 17l-5-5" /></svg><span>{t("badge1")}</span></div>
+            <div className="hero-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="3" width="15" height="13" /><path d="M16 8h4l3 3v5h-7V8z" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" /></svg><span>{t("badge2")}</span></div>
+            <div className="hero-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg><span>{t("badge3")}</span></div>
           </div>
         </div>
         <div className="hero-visual">
           {S("hero_visual_img", "") ? (
             <img src={optimizeCldUrl(S("hero_visual_img", ""), { w: 800 })} alt="" fetchPriority="high" loading="eager" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           ) : (
-            <svg viewBox="0 0 200 130" width="72%" fill="none" stroke="#F3F0E9" strokeWidth="1.4">
+            <svg viewBox="0 0 200 130" width="72%" fill="none" stroke="#E8E8E4" strokeWidth="1.4">
               <path d="M10 95c0-8 8-14 18-16 12-2 20-10 30-14 14-6 30-6 42 2 6 4 10 4 18 2 14-4 30 0 42 10 8 6 12 8 20 8 6 0 8 4 8 8v8c0 4-3 7-7 7H17c-4 0-7-3-7-7v-8z" />
               <path d="M40 95v-10M60 95v-14M85 95v-16" strokeDasharray="2 3" />
             </svg>
           )}
           <div className="hero-visual-caption">
             <div>
-              <div className="text-label" style={{ fontSize: 11, color: "var(--cop)" }}>{S("hero_visual_sku", "SKU // CP-0192")}</div>
+              <div className="text-label" style={{ fontSize: 10, color: "var(--cop-dim)" }}>{S("hero_visual_sku", "SKU // CP-0192")}</div>
               <div className="hero-visual-title">{S("hero_visual_title", "New Arrival")}</div>
             </div>
             <div className="hero-visual-stat">{S("hero_visual_stat", "28K+")}<br /><span className="hero-visual-stat-label">{S("hero_visual_stat_label", "COPPERS")}</span></div>
@@ -84,15 +84,25 @@ function Categories({ categories: dbCats, lang, t }: { categories: CatItem[]; la
   return (
     <section className="wrap">
       <div className="section-head">
-        <div><h2 className="text-heading">{t("cat_title")}</h2><p>{t("cat_sub")}</p></div>
+        <div><h2 className="text-heading">{t("cat_title")}</h2></div>
       </div>
       <div className="cat-grid">
         {cats.map((cat) => (
-          <a key={cat.slug} href={`/shop?category=${encodeURIComponent(cat.slug)}`} className="cat-card" style={cat.imageUrl ? { position: "relative", overflow: "hidden" } : {}}>
-            {cat.imageUrl && <img src={optimizeCldUrl(cat.imageUrl, { w: 400 })} alt="" loading="lazy" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />}
-            <div className="cat-card-overlay" style={cat.imageUrl ? { position: "relative", zIndex: 1, background: "rgba(0,0,0,0.45)", padding: 20, borderRadius: "var(--radius)" } : {}}>
-              <h3>{cat[nameKey]}</h3>
-            </div>
+          <a key={cat.slug} href={`/shop?category=${encodeURIComponent(cat.slug)}`} className="cat-card">
+            {cat.imageUrl ? (
+              <>
+                <img src={optimizeCldUrl(cat.imageUrl, { w: 400 })} alt="" loading="lazy" className="cat-card-img" />
+                <div className="cat-card-overlay cat-card-img-overlay">
+                  <h3>{cat[nameKey]}</h3>
+                  <p>{t("shop_title")} →</p>
+                </div>
+              </>
+            ) : (
+              <div className="cat-card-overlay">
+                <h3>{cat[nameKey]}</h3>
+                <p>{t("shop_title")} →</p>
+              </div>
+            )}
           </a>
         ))}
       </div>
@@ -100,7 +110,6 @@ function Categories({ categories: dbCats, lang, t }: { categories: CatItem[]; la
   );
 }
 
-/* ===== AUTO-ROTATING SLIDE CAROUSEL ===== */
 function SlideCarousel({ slide, speed = 3000 }: { slide: SlideItem; speed?: number }) {
   const [imgIdx, setImgIdx] = useState(0);
   const [prevIdx, setPrevIdx] = useState<number | null>(null);
@@ -178,7 +187,6 @@ interface SlideItem {
   rotationSpeed: number; active: boolean; position: number;
 }
 
-/* ===== NEW ARRIVALS / SLIDES SECTION ===== */
 function SlidesSection({ slides, title, subtitle, seeAllLink = "/shop" }: { slides: SlideItem[]; title: string; subtitle: string; seeAllLink?: string }) {
   const { t } = useLang();
   if (!slides.length) return null;
@@ -186,7 +194,7 @@ function SlidesSection({ slides, title, subtitle, seeAllLink = "/shop" }: { slid
     <section className="wrap">
       <div className="section-head">
         <div><h2 className="text-heading">{title}</h2>{subtitle && <p>{subtitle}</p>}</div>
-        <a href={seeAllLink} className="btn btn-outline">{t("see_all")}</a>
+        <a href={seeAllLink} className="btn btn-outline btn-sm">{t("see_all")}</a>
       </div>
       <div className={`slide-grid ${slides.length > 1 ? "cols-2" : "cols-1"}`}>
         {slides.map(s => (
@@ -200,7 +208,7 @@ function SlidesSection({ slides, title, subtitle, seeAllLink = "/shop" }: { slid
 }
 
 function WhyIcon({ name }: { name: string }) {
-  const props = { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "1.8", style: { width: 26, height: 26 } } as const;
+  const props = { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "1.8", style: { width: 24, height: 24 } } as const;
   switch (name) {
     case "check": return <svg {...props}><path d="M20 6L9 17l-5-5" /></svg>;
     case "truck": return <svg {...props}><rect x="1" y="3" width="15" height="13" /><path d="M16 8h4l3 3v5h-7V8z" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" /></svg>;
@@ -348,7 +356,7 @@ export default function HomePage() {
         <section className="wrap">
           <div className="section-head">
             <div><h2 className="text-heading">{t("new_title")}</h2><p>{t("new_sub")}</p></div>
-            <a href="/shop" className="btn btn-outline">{t("see_all")}</a>
+            <a href="/shop" className="btn btn-outline btn-sm">{t("see_all")}</a>
           </div>
           <div className="grid-products">
             {productsError ? (
@@ -382,7 +390,7 @@ export default function HomePage() {
             <a href="tel:0562829805">0562 82 98 05</a>
           </div>
           <div className="trust-policy">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" style={{ width: 18, height: 18, color: "var(--cop)", flexShrink: 0 }}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" style={{ width: 18, height: 18, color: "var(--cop-dim)", flexShrink: 0 }}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
             <span>{t("hero_policy")}</span>
           </div>
         </div>

@@ -11,10 +11,10 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
 
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 40, textAlign: "center" }}>
-      <div className="mono" style={{ fontSize: 60, fontWeight: 700, color: "var(--cop)", lineHeight: 1 }}>
+      <div className="text-price" style={{ fontSize: 60, color: "var(--cop-dim)", lineHeight: 1 }}>
         Oops
       </div>
-      <h1 className="display" style={{ fontSize: "clamp(24px, 4vw, 36px)", marginTop: 16, textTransform: "uppercase" }}>
+      <h1 className="text-heading" style={{ fontSize: "clamp(24px, 4vw, 36px)" }}>
         {lang === "ar" ? "حدث خطأ ما" : "Quelque chose s'est mal passé"}
       </h1>
       <p style={{ color: "var(--steel)", fontSize: 15, marginTop: 10, maxWidth: 420, lineHeight: 1.6 }}>

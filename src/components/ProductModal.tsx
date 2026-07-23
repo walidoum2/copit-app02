@@ -71,13 +71,13 @@ export default function ProductModal({
   return (
     <div className={`pmodal-overlay ${show ? "show" : ""}`} onClick={onClose}>
       <div className="pmodal-inner" onClick={(e) => e.stopPropagation()}>
-        <button className="pmodal-close" onClick={onClose}>
+        <button className="pmodal-close" onClick={onClose} aria-label="Close">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12" /></svg>
         </button>
         <div className="pmodal-grid">
           <div className="pmodal-img" style={mainImg ? {} : { "--sw1": sw1, "--sw2": sw2 } as React.CSSProperties}>
             {mainImg ? (
-              <img src={mainImg} alt={product!.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              <img src={mainImg} alt={product!.name} />
             ) : (
               <svg viewBox="0 0 200 130" width="52%" fill="none" stroke="currentColor" strokeWidth="1.2">
                 <path d="M10 95c0-8 8-14 18-16 12-2 20-10 30-14 14-6 30-6 42 2 6 4 10 4 18 2 14-4 30 0 42 10 8 6 12 8 20 8 6 0 8 4 8 8v8c0 4-3 7-7 7H17c-4 0-7-3-7-7v-8z" />
@@ -86,15 +86,32 @@ export default function ProductModal({
           </div>
           <div className="pmodal-info">
             <div className="pmodal-brand">{product!.brand} · <span className="mono" style={{ color: "var(--steel)" }}>{product!.sku}</span></div>
-            <h2 className="display" style={{ fontSize: 28 }}>{product!.name}</h2>
+            <h2>{product!.name}</h2>
             <div className="pmodal-price">
               <span className="now">{money(product!.price)}</span>
               {product!.originalPrice > product!.price && <span className="was">{money(product!.originalPrice)}</span>}
             </div>
             <div className="pmodal-stock">
-              <span className="dot" />
-              <span>{totalStock} {t("in_stock")}</span>
+              <span className="dot" style={{ background: totalStock > 0 ? "var(--cop)" : "var(--steel)" }} />
+              <span>{totalStock > 0 ? `${totalStock} ${t("in_stock")}` : t("out_of_stock")}</span>
             </div>
+
+            {colors.length > 1 && (
+              <>
+                <div className="opt-label">{t("select_color")}</div>
+                <div className="color-row">
+                  {colors.map((c, i) => (
+                    <button
+                      key={c}
+                      className={`color-chip ${i === selColor ? "sel" : ""}`}
+                      style={{ background: product!.variants.find((v) => v.color === c)?.colorHex || "#888" }}
+                      onClick={() => { setSelColor(i); setSelSize(null); }}
+                      aria-label={c}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
 
             <div className="opt-label">{t("select_size")}</div>
             <div className="size-row">
@@ -103,8 +120,9 @@ export default function ProductModal({
                 return (
                   <button
                     key={s}
-                    className={`size-chip ${selSize === s ? "sel" : ""} ${st === 0 ? "oos" : ""} ${st > 0 && st <= 2 ? "low" : ""}`}
+                    className={`size-chip ${selSize === s ? "sel" : ""} ${st === 0 ? "oos" : ""}`}
                     onClick={() => setSelSize(s)}
+                    disabled={st === 0}
                   >
                     {s}
                   </button>
@@ -112,20 +130,8 @@ export default function ProductModal({
               })}
             </div>
 
-            <div className="opt-label">{t("select_color")}</div>
-            <div className="color-row">
-              {colors.map((c, i) => (
-                <div
-                  key={c}
-                  className={`color-chip ${i === selColor ? "sel" : ""}`}
-                  style={{ background: product!.variants.find((v) => v.color === c)?.colorHex || "#888" }}
-                  onClick={() => { setSelColor(i); setSelSize(null); }}
-                />
-              ))}
-            </div>
-
             <div className="pmodal-cta">
-              <button className="btn btn-primary btn-block" onClick={handleAdd}>{t("add_to_cart")}</button>
+              <button className="btn btn-primary btn-block" onClick={handleAdd} disabled={totalStock === 0}>{t("add_to_cart")}</button>
             </div>
 
             <div className="spec-list">

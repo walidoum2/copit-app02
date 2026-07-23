@@ -55,8 +55,8 @@ function ShopContent() {
       />
 
       <div className="wrap page-head">
-        <h1 className="display">{promo ? t("promo_title") : t("shop_title")}</h1>
-        {promo && <p style={{ color: "var(--steel)", marginTop: 6 }}>{t("promo_sub")}</p>}
+        <h1 className="text-heading">{promo ? t("promo_title") : t("shop_title")}</h1>
+        {promo && <p>{t("promo_sub")}</p>}
       </div>
       <div className="wrap" style={{ padding: "36px 0 80px" }}>
         {loading ? (
@@ -73,10 +73,10 @@ function ShopContent() {
               )}
             </div>
             {totalPages > 1 && (
-              <div style={{ display: "flex", justifyContent: "center", gap: 8, marginTop: 40 }}>
-                <button className="btn btn-outline btn-sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>← Prev</button>
-                <span className="mono" style={{ padding: "10px 16px", fontSize: 13 }}>Page {page} / {totalPages}</span>
-                <button className="btn btn-outline btn-sm" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>Next →</button>
+              <div className="pag">
+                <button className="pag-btn" disabled={page <= 1} onClick={() => setPage(page - 1)}>←</button>
+                <span className="pag-info">{page} / {totalPages}</span>
+                <button className="pag-btn" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>→</button>
               </div>
             )}
           </>

@@ -15,7 +15,7 @@ export default function VipPage() {
       <Header onCartOpen={() => setCartOpen(true)} />
       <CartDrawer show={cartOpen} onClose={() => setCartOpen(false)} />
       <div className="wrap page-head">
-        <h1 className="display">{t("vip_title")}</h1>
+        <h1 className="text-heading">{t("vip_title")}</h1>
       </div>
       <section className="wrap" style={{ padding: "40px 0 80px" }}>
         <div style={{ maxWidth: 600 }}>

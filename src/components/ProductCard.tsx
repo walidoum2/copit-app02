@@ -66,11 +66,11 @@ export default memo(function ProductCard({ product, onClick }: { product: Produc
   const img = product.images?.[0]?.url;
 
   return (
-    <div className="pcard" onClick={onClick}>
+    <div className="pcard" onClick={onClick} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter") onClick(); }}>
       <div className="pcard-img" style={img ? {} : { "--sw1": sw1, "--sw2": sw2 } as React.CSSProperties}>
-        {product.tag && <span className="badge pcard-tag">{product.tag}</span>}
+        {product.tag && <span className={`badge pcard-tag${!img ? "" : ""}`}>{product.tag}</span>}
         {img && !imgErr ? (
-          <img src={optimizeCldUrl(img, { w: 400 })} alt={product.name} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={() => setImgErr(true)} />
+          <img src={optimizeCldUrl(img, { w: 400 })} alt={product.name} loading="lazy" onError={() => setImgErr(true)} />
         ) : (
           <ProductIcon category={product.category} />
         )}
@@ -84,11 +84,11 @@ export default memo(function ProductCard({ product, onClick }: { product: Produc
             <span className="was">{money(product.originalPrice)}</span>
           )}
         </div>
-        {totalStock < 8 && (
-          <>
+        {totalStock < 8 && totalStock > 0 && (
+          <div style={{ marginTop: 10 }}>
             <div className="copmeter"><i style={{ width: `${pct}%` }} /></div>
-            <div className="copmeter-label">{totalStock} unités restantes</div>
-          </>
+            <div className="copmeter-label">{totalStock} unites restantes</div>
+          </div>
         )}
       </div>
     </div>

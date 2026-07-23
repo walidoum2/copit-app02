@@ -122,7 +122,7 @@ export default function CheckoutPage() {
           <div style={{ width: 64, height: 64, borderRadius: "50%", background: "var(--bg2)", border: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" }}>
             <svg viewBox="0 0 24 24" fill="none" stroke="var(--cop)" strokeWidth="2" style={{ width: 28, height: 28 }}><path d="M20 6L9 17l-5-5" /></svg>
           </div>
-          <h1 className="display" style={{ fontSize: "clamp(28px, 5vw, 40px)", textTransform: "uppercase" }}>
+          <h1 className="text-heading" style={{ fontSize: "clamp(28px, 5vw, 40px)" }}>
             {lang === "ar" ? "تم تأكيد طلبيتك!" : "Commande confirmée !"}
           </h1>
           <p className="mono" style={{ fontSize: 14, color: "var(--cop)", marginTop: 10 }}>
@@ -168,7 +168,7 @@ export default function CheckoutPage() {
     <>
       <Header onCartOpen={() => {}} />
       <div className="wrap page-head">
-        <h1 className="display">{t("checkout_title")}</h1>
+        <h1 className="text-heading">{t("checkout_title")}</h1>
       </div>
       <div className="wrap" style={{ paddingBottom: 90 }}>
         <div className="checkout-grid">
