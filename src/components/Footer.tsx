@@ -48,17 +48,17 @@ export default function Footer() {
       <div className="wrap">
         <div className="footer-grid">
           <div>
-            <div style={{ marginBottom: 16 }}>
+            <div className="footer-logo">
               {logoErr ? (
-                <span style={{ fontFamily: "'Anton', sans-serif", fontSize: 22, letterSpacing: 1 }}>COP<span style={{ color: "var(--cop)" }}>IT</span></span>
+                <span className="display" style={{ fontSize: 22, letterSpacing: 1 }}>COP<span style={{ color: "var(--cop)" }}>IT</span></span>
               ) : (
-                <div style={{ width: 42, height: 42, borderRadius: "50%", background: "var(--bg)", border: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <div className="footer-logo-circle">
                   <img src="/logo.png" alt="COPIT" style={{ height: 28, width: "auto", display: "block" }} onError={() => setLogoErr(true)} />
                 </div>
               )}
             </div>
-            <p style={{ fontSize: 13, color: "var(--steel)", maxWidth: 280, lineHeight: 1.6 }}>{t("footer_bio")}</p>
-            <div className="social-row" style={{ marginTop: 20 }}>
+            <p className="footer-bio">{t("footer_bio")}</p>
+            <div className="social-row">
               <a href="https://www.tiktok.com/@copit_dz" target="_blank" rel="noopener noreferrer">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z" /></svg>
               </a>
@@ -90,12 +90,12 @@ export default function Footer() {
             {bySection("legal").map((l, i) => (
               l.url.startsWith("http") ? <a key={i} href={l.url} target="_blank" rel="noopener noreferrer">{l[labelKey]}</a> : <Link key={i} href={l.url}>{l[labelKey]}</Link>
             ))}
-            <Link href="/admin" style={{ opacity: 0.3, fontSize: 11 }}>Admin</Link>
+            <Link href="/admin" className="footer-admin">Admin</Link>
           </div>
         </div>
         <div className="footer-bottom">
           <span>© 2026 COP IT DZ. {t("foot_rights")}</span>
-          <span className="mono">MADE IN DZ</span>
+          <span className="mono" style={{ fontSize: 11 }}>MADE IN DZ</span>
         </div>
       </div>
     </footer>

@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useCart, type CartItem } from "@/contexts/CartContext";
+import { useCart } from "@/contexts/CartContext";
 import { useLang } from "@/contexts/LangContext";
-import { WILAYAS } from "@/data/dictionary";
 import type { ProductData } from "./ProductCard";
 
 const PALETTE: Record<string, [string, string]> = {
@@ -16,29 +15,6 @@ const PALETTE: Record<string, [string, string]> = {
   "CP-BS-CG1": ["#dadcd6", "#c8cac4"],
   "CP-BS-BK1": ["#ddd5ce", "#ccc4bc"],
 };
-
-function ProductIcon({ category }: { category: string }) {
-  if (category === "Vêtements") {
-    return (
-      <svg viewBox="0 0 100 100" width="45%" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <path d="M35 15L20 25v15h8v45h44V40h8V25L65 15l-6 6a12 12 0 01-18 0z" />
-      </svg>
-    );
-  }
-  if (category === "Accessoires") {
-    return (
-      <svg viewBox="0 0 100 100" width="40%" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <ellipse cx="50" cy="35" rx="34" ry="14" />
-        <path d="M20 35c0 20 6 40 30 40s30-20 30-40" />
-      </svg>
-    );
-  }
-  return (
-    <svg viewBox="0 0 200 130" width="52%" fill="none" stroke="currentColor" strokeWidth="1.2">
-      <path d="M10 95c0-8 8-14 18-16 12-2 20-10 30-14 14-6 30-6 42 2 6 4 10 4 18 2 14-4 30 0 42 10 8 6 12 8 20 8 6 0 8 4 8 8v8c0 4-3 7-7 7H17c-4 0-7-3-7-7v-8z" />
-    </svg>
-  );
-}
 
 function money(n: number) { return n.toLocaleString("fr-FR") + " DA"; }
 
@@ -103,12 +79,14 @@ export default function ProductModal({
             {mainImg ? (
               <img src={mainImg} alt={product!.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             ) : (
-              <ProductIcon category={product!.category} />
+              <svg viewBox="0 0 200 130" width="52%" fill="none" stroke="currentColor" strokeWidth="1.2">
+                <path d="M10 95c0-8 8-14 18-16 12-2 20-10 30-14 14-6 30-6 42 2 6 4 10 4 18 2 14-4 30 0 42 10 8 6 12 8 20 8 6 0 8 4 8 8v8c0 4-3 7-7 7H17c-4 0-7-3-7-7v-8z" />
+              </svg>
             )}
           </div>
           <div className="pmodal-info">
-            <div className="brand">{product!.brand} · <span className="mono" style={{ color: "var(--steel)" }}>{product!.sku}</span></div>
-            <h2 className="display">{product!.name}</h2>
+            <div className="pmodal-brand">{product!.brand} · <span className="mono" style={{ color: "var(--steel)" }}>{product!.sku}</span></div>
+            <h2 className="display" style={{ fontSize: 28 }}>{product!.name}</h2>
             <div className="pmodal-price">
               <span className="now">{money(product!.price)}</span>
               {product!.originalPrice > product!.price && <span className="was">{money(product!.originalPrice)}</span>}

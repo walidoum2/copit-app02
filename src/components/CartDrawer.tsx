@@ -31,15 +31,15 @@ export default function CartDrawer({ show, onClose }: { show: boolean; onClose: 
           ) : (
             items.map((item) => (
               <div key={item.variantId} className="cart-line">
-                <div className="cart-thumb" style={{ background: "var(--ink2)" }}>
+                <div className="cart-thumb">
                   <svg viewBox="0 0 200 130" width="60%" fill="none" stroke="currentColor" strokeWidth="1.2">
                     <path d="M10 95c0-8 8-14 18-16 12-2 20-10 30-14 14-6 30-6 42 2 6 4 10 4 18 2 14-4 30 0 42 10 8 6 12 8 20 8 6 0 8 4 8 8v8c0 4-3 7-7 7H17c-4 0-7-3-7-7v-8z" />
                   </svg>
                 </div>
                 <div className="cart-info">
-                  <div className="nm">{item.name}</div>
-                  <div className="meta">{item.brand} · {item.color} · {item.size}</div>
-                  <div className="price">{money(item.price)}</div>
+                  <div className="cart-item-name">{item.name}</div>
+                  <div className="cart-item-meta">{item.brand} · {item.color} · {item.size}</div>
+                  <div className="cart-item-price">{money(item.price)}</div>
                   <div className="qty-row">
                     <button onClick={() => changeQty(item.variantId, -1)}>−</button>
                     <span>{item.quantity}</span>
@@ -59,7 +59,6 @@ export default function CartDrawer({ show, onClose }: { show: boolean; onClose: 
             </div>
             <button
               className="btn btn-primary btn-block"
-              style={{ marginTop: 14 }}
               onClick={() => { onClose(); router.push("/checkout"); }}
             >
               {t("checkout_btn")}

@@ -20,16 +20,16 @@ function HeroSection({ settings }: { settings: Record<string, string> }) {
       <div className="wrap hero-grid">
         <div>
           <div className="eyebrow">{S("hero_eyebrow", "DROP EN COURS — 69 WILAYAS")}</div>
-          <h1 className="display" style={{ marginTop: 12, fontSize: "clamp(36px, 5vw, 72px)" }}>{S("hero_title", "LIKE IT. WANT IT. COP IT.")}</h1>
-          <p className="lead" style={{ fontSize: 14, marginTop: 14 }}>{t("hero_policy")}</p>
+          <h1 className="text-display" style={{ marginTop: 12 }}>{S("hero_title", "LIKE IT. WANT IT. COP IT.")}</h1>
+          <p className="hero-policy">{t("hero_policy")}</p>
           <div className="hero-cta">
-            <a href="/shop?promo=true" className="btn btn-primary" style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+            <a href="/shop?promo=true" className="btn btn-primary">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ width: 16, height: 16 }}><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
               {t("promo_btn")}
             </a>
             <a href="/shop" className="btn btn-outline">{t("hero_cta1")}</a>
           </div>
-          <div className="hero-badges" style={{ marginTop: 28 }}>
+          <div className="hero-badges">
             <div className="hero-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 6L9 17l-5-5" /></svg><span>{t("badge1")}</span></div>
             <div className="hero-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="3" width="15" height="13" /><path d="M16 8h4l3 3v5h-7V8z" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" /></svg><span>{t("badge2")}</span></div>
             <div className="hero-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg><span>{t("badge3")}</span></div>
@@ -44,12 +44,12 @@ function HeroSection({ settings }: { settings: Record<string, string> }) {
               <path d="M40 95v-10M60 95v-14M85 95v-16" strokeDasharray="2 3" />
             </svg>
           )}
-          <div style={{ position: "absolute", bottom: 18, left: 18, right: 18, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+          <div className="hero-visual-caption">
             <div>
-              <div className="mono" style={{ fontSize: 11, color: "var(--cop)" }}>{S("hero_visual_sku", "SKU // CP-0192")}</div>
-              <div style={{ fontSize: 13, fontWeight: 700, marginTop: 4 }}>{S("hero_visual_title", "New Arrival")}</div>
+              <div className="text-label" style={{ fontSize: 11, color: "var(--cop)" }}>{S("hero_visual_sku", "SKU // CP-0192")}</div>
+              <div className="hero-visual-title">{S("hero_visual_title", "New Arrival")}</div>
             </div>
-            <div className="mono" style={{ fontSize: 11, textAlign: "right", color: "var(--steel)" }}>{S("hero_visual_stat", "28K+")}<br />{S("hero_visual_stat_label", "COPPERS")}</div>
+            <div className="hero-visual-stat">{S("hero_visual_stat", "28K+")}<br /><span className="hero-visual-stat-label">{S("hero_visual_stat_label", "COPPERS")}</span></div>
           </div>
         </div>
       </div>
@@ -84,13 +84,13 @@ function Categories({ categories: dbCats, lang, t }: { categories: CatItem[]; la
   return (
     <section className="wrap">
       <div className="section-head">
-        <div><h2 className="display">{t("cat_title")}</h2><p>{t("cat_sub")}</p></div>
+        <div><h2 className="text-heading">{t("cat_title")}</h2><p>{t("cat_sub")}</p></div>
       </div>
       <div className="cat-grid">
         {cats.map((cat) => (
           <a key={cat.slug} href={`/shop?category=${encodeURIComponent(cat.slug)}`} className="cat-card" style={cat.imageUrl ? { position: "relative", overflow: "hidden" } : {}}>
             {cat.imageUrl && <img src={optimizeCldUrl(cat.imageUrl, { w: 400 })} alt="" loading="lazy" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />}
-            <div style={cat.imageUrl ? { position: "relative", zIndex: 1, background: "rgba(0,0,0,0.45)", padding: 20, borderRadius: "var(--radius)" } : {}}>
+            <div className="cat-card-overlay" style={cat.imageUrl ? { position: "relative", zIndex: 1, background: "rgba(0,0,0,0.45)", padding: 20, borderRadius: "var(--radius)" } : {}}>
               <h3>{cat[nameKey]}</h3>
             </div>
           </a>
@@ -127,7 +127,7 @@ function SlideCarousel({ slide, speed = 3000 }: { slide: SlideItem; speed?: numb
   const imgStyle: React.CSSProperties = { position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", transition: "opacity 0.5s ease" };
 
   return (
-    <div className="slide-carousel" style={{ position: "relative", width: "100%", aspectRatio: "1/1", overflow: "hidden", borderRadius: "var(--radius)", background: "var(--bg2)" }}
+    <div className="slide-carousel"
       onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
       {images.length > 0 ? (
         <>
@@ -137,7 +137,7 @@ function SlideCarousel({ slide, speed = 3000 }: { slide: SlideItem; speed?: numb
           <img key={`cur-${imgIdx}`} src={optimizeCldUrl(images[imgIdx], { w: 600 })} alt={slide.title} loading="lazy" style={{ ...imgStyle, opacity: 1, zIndex: 2 }} />
         </>
       ) : (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "var(--steel)", fontSize: 13 }}>{slide.title}</div>
+        <div className="slide-empty">{slide.title}</div>
       )}
       {images.length > 1 && (
         <>
@@ -149,11 +149,11 @@ function SlideCarousel({ slide, speed = 3000 }: { slide: SlideItem; speed?: numb
           </button>
         </>
       )}
-      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "16px", background: "linear-gradient(transparent, rgba(0,0,0,0.6))", color: "#fff" }}>
-        <div style={{ fontSize: 13, fontWeight: 700 }}>{slide.title}</div>
-        {slide.subtitle && <div style={{ fontSize: 11, opacity: 0.8, marginTop: 2 }}>{slide.subtitle}</div>}
+      <div className="slide-caption">
+        <div className="slide-caption-title">{slide.title}</div>
+        {slide.subtitle && <div className="slide-caption-sub">{slide.subtitle}</div>}
         {slide.price > 0 && (
-          <div style={{ display: "flex", gap: 6, alignItems: "baseline", marginTop: 4 }}>
+          <div className="slide-caption-price">
             <span className="mono" style={{ fontSize: 13, fontWeight: 700 }}>{money(slide.price)}</span>
             {slide.originalPrice > slide.price && (
               <span className="mono" style={{ fontSize: 11, opacity: 0.6, textDecoration: "line-through" }}>{money(slide.originalPrice)}</span>
@@ -162,9 +162,9 @@ function SlideCarousel({ slide, speed = 3000 }: { slide: SlideItem; speed?: numb
         )}
       </div>
       {images.length > 1 && (
-        <div style={{ position: "absolute", top: 10, right: 10, display: "flex", gap: 4 }}>
+        <div className="slide-dots">
           {images.map((_, idx) => (
-            <button key={idx} onClick={() => setImgIdx(idx)} style={{ width: 8, height: 8, borderRadius: "50%", border: "none", background: idx === imgIdx ? "#fff" : "rgba(255,255,255,0.4)", cursor: "pointer", padding: 0, transition: "background 0.2s" }} />
+            <button key={idx} onClick={() => setImgIdx(idx)} className={`slide-dot ${idx === imgIdx ? "active" : ""}`} />
           ))}
         </div>
       )}
@@ -185,7 +185,7 @@ function SlidesSection({ slides, title, subtitle, seeAllLink = "/shop" }: { slid
   return (
     <section className="wrap">
       <div className="section-head">
-        <div><h2 className="display">{title}</h2>{subtitle && <p>{subtitle}</p>}</div>
+        <div><h2 className="text-heading">{title}</h2>{subtitle && <p>{subtitle}</p>}</div>
         <a href={seeAllLink} className="btn btn-outline">{t("see_all")}</a>
       </div>
       <div className={`slide-grid ${slides.length > 1 ? "cols-2" : "cols-1"}`}>
@@ -200,7 +200,7 @@ function SlidesSection({ slides, title, subtitle, seeAllLink = "/shop" }: { slid
 }
 
 function WhyIcon({ name }: { name: string }) {
-  const props = { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "1.8", style: { width: 28, height: 28 } } as const;
+  const props = { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "1.8", style: { width: 26, height: 26 } } as const;
   switch (name) {
     case "check": return <svg {...props}><path d="M20 6L9 17l-5-5" /></svg>;
     case "truck": return <svg {...props}><rect x="1" y="3" width="15" height="13" /><path d="M16 8h4l3 3v5h-7V8z" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" /></svg>;
@@ -222,7 +222,7 @@ function WhyUs({ items: dbItems, lang, t }: { items: WhyItem[]; lang: string; t:
   const pKey = lang === "ar" ? "paragraphAr" : lang === "en" ? "paragraphEn" : "paragraphFr" as keyof WhyItem;
   return (
     <section className="wrap">
-      <div className="section-head"><div><h2 className="display">{t("why_title")}</h2></div></div>
+      <div className="section-head"><div><h2 className="text-heading">{t("why_title")}</h2></div></div>
       <div className="why-grid">
         {items.map((item, i) => (
           <div key={i} className="why-item">
@@ -246,7 +246,7 @@ function FAQSection({ faqs: dbFaqs, lang, t }: { faqs: FaqEntry[]; lang: string;
 
   return (
     <section className="wrap" id="faq">
-      <div className="section-head"><div><h2 className="display">{t("faq_title")}</h2></div></div>
+      <div className="section-head"><div><h2 className="text-heading">{t("faq_title")}</h2></div></div>
       <div>
         {faqs.map((f, i) => (
           <div key={i} className={`faq-item ${i === openIdx ? "open" : ""}`}>
@@ -347,7 +347,7 @@ export default function HomePage() {
       ) : (
         <section className="wrap">
           <div className="section-head">
-            <div><h2 className="display">{t("new_title")}</h2><p>{t("new_sub")}</p></div>
+            <div><h2 className="text-heading">{t("new_title")}</h2><p>{t("new_sub")}</p></div>
             <a href="/shop" className="btn btn-outline">{t("see_all")}</a>
           </div>
           <div className="grid-products">

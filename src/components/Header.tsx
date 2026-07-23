@@ -14,7 +14,7 @@ export default function Header({ onCartOpen }: { onCartOpen: () => void }) {
   return (
     <header className="header">
       <div className="wrap nav">
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+        <div className="hdr-left">
           <button className="icon-btn hamburger" onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
               {menuOpen ? (
@@ -24,17 +24,15 @@ export default function Header({ onCartOpen }: { onCartOpen: () => void }) {
               )}
             </svg>
           </button>
-          <Link href="/" className="logo" style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <Link href="/" className="logo">
             {logoErr ? (
-              <span style={{ fontFamily: "'Anton', sans-serif", fontSize: 22, letterSpacing: 1 }}>COP<span style={{ color: "var(--cop)" }}>IT</span></span>
+              <span className="display" style={{ fontSize: 22, letterSpacing: 1 }}>COP<span style={{ color: "var(--cop)" }}>IT</span></span>
             ) : (
-              <div style={{ width: 38, height: 38, borderRadius: "50%", background: "var(--bg2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <img src="/logo.png" alt="COPIT" style={{ height: 26, width: "auto", display: "block" }} onError={() => setLogoErr(true)} />
+              <div className="logo-circle">
+                <img src="/logo.png" alt="COPIT" className="logo-img" onError={() => setLogoErr(true)} />
               </div>
             )}
-            <span className="mono" style={{ fontSize: 10, letterSpacing: 1.2, color: "var(--text-dim)", fontWeight: 600, textTransform: "uppercase", lineHeight: 1.2, maxWidth: 120 }}>
-              {t("hero_slogan")}
-            </span>
+            <span className="text-meta" style={{ maxWidth: 120, lineHeight: 1.2 }}>{t("hero_slogan")}</span>
           </Link>
         </div>
         <nav className={`navlinks ${menuOpen ? "open" : ""}`}>
@@ -67,7 +65,6 @@ export default function Header({ onCartOpen }: { onCartOpen: () => void }) {
         </div>
       </div>
 
-      {/* Mobile overlay */}
       {menuOpen && <div className="mobile-overlay" onClick={() => setMenuOpen(false)} />}
       <div className={`mobile-nav ${menuOpen ? "open" : ""}`}>
         <Link href="/shop?category=Chaussures" onClick={() => setMenuOpen(false)}>{t("nav_sneakers")}</Link>

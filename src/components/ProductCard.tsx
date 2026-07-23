@@ -46,7 +46,6 @@ function ProductIcon({ category }: { category: string }) {
   );
 }
 
-// Color palette per product for gradient backgrounds
 const PALETTE: Record<string, [string, string]> = {
   "CP-DM-1460": ["#e8ddd6", "#d4c9bf"],
   "CP-UA-HP3": ["#d6d9de", "#c4c7cc"],
@@ -69,7 +68,7 @@ export default memo(function ProductCard({ product, onClick }: { product: Produc
   return (
     <div className="pcard" onClick={onClick}>
       <div className="pcard-img" style={img ? {} : { "--sw1": sw1, "--sw2": sw2 } as React.CSSProperties}>
-        {product.tag && <div className="pcard-tag">{product.tag}</div>}
+        {product.tag && <span className="badge pcard-tag">{product.tag}</span>}
         {img && !imgErr ? (
           <img src={optimizeCldUrl(img, { w: 400 })} alt={product.name} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={() => setImgErr(true)} />
         ) : (
@@ -80,13 +79,17 @@ export default memo(function ProductCard({ product, onClick }: { product: Produc
         <div className="pcard-brand">{product.brand}</div>
         <div className="pcard-name">{product.name}</div>
         <div className="pcard-price">
-          <span className="now mono">{money(product.price)}</span>
+          <span className="now">{money(product.price)}</span>
           {product.originalPrice > product.price && (
-            <span className="was mono">{money(product.originalPrice)}</span>
+            <span className="was">{money(product.originalPrice)}</span>
           )}
         </div>
-        <div className="copmeter"><i style={{ width: `${pct}%` }} /></div>
-        <div className="copmeter-label">{totalStock} unités restantes</div>
+        {totalStock < 8 && (
+          <>
+            <div className="copmeter"><i style={{ width: `${pct}%` }} /></div>
+            <div className="copmeter-label">{totalStock} unités restantes</div>
+          </>
+        )}
       </div>
     </div>
   );
