@@ -12,6 +12,23 @@ import { optimizeCldUrl } from "@/lib/cloudinary";
 
 function money(n: number) { return n.toLocaleString("fr-FR") + " DA"; }
 
+function useScrollReveal() {
+  useEffect(() => {
+    const els = document.querySelectorAll("[data-reveal]");
+    if (!els.length) return;
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
+    els.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+}
+
 function HeroSection({ settings }: { settings: Record<string, string> }) {
   const { t } = useLang();
   const S = (key: string, fallback: string) => settings[key] || fallback;
@@ -19,10 +36,10 @@ function HeroSection({ settings }: { settings: Record<string, string> }) {
     <section className="hero">
       <div className="wrap hero-grid">
         <div>
-          <div className="hero-eyebrow">{S("hero_eyebrow", "DROP EN COURS — 69 WILAYAS")}</div>
-          <h1 className="hero-title">{S("hero_title", "LIKE IT. WANT IT. COP IT.")}</h1>
-          <p className="hero-body">{t("hero_policy")}</p>
-          <div className="hero-actions">
+          <div className="hero-eyebrow hero-animate hero-animate-d1">{S("hero_eyebrow", "DROP EN COURS — 69 WILAYAS")}</div>
+          <h1 className="hero-title hero-animate hero-animate-d2">{S("hero_title", "LIKE IT. WANT IT. COP IT.")}</h1>
+          <p className="hero-body hero-animate hero-animate-d3">{t("hero_policy")}</p>
+          <div className="hero-actions hero-animate hero-animate-d3">
             <a href="/shop?promo=true" className="btn btn-primary">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ width: 14, height: 14 }}><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
               {t("promo_btn")}
@@ -99,7 +116,7 @@ function Categories({ categories: dbCats, lang, t }: { categories: CatItem[]; la
   const cats = dbCats.length > 0 ? dbCats : FALLBACK_CATS;
   const nameKey = lang === "ar" ? "nameAr" : lang === "en" ? "nameEn" : "nameFr" as keyof CatItem;
   return (
-    <section className="wrap">
+    <section className="wrap" data-reveal>
       <div className="section-head">
         <div><h2 className="text-heading">{t("cat_title")}</h2></div>
       </div>
@@ -108,7 +125,7 @@ function Categories({ categories: dbCats, lang, t }: { categories: CatItem[]; la
           <a key={cat.slug} href={`/shop?category=${encodeURIComponent(cat.slug)}`} className="cat-card">
             <div className="cat-card-img-wrap">
               {cat.imageUrl ? (
-                <img src={optimizeCldUrl(cat.imageUrl, { w: 400 })} alt="" loading="lazy" />
+                <img src={optimizeCldUrl(cat.imageUrl, { w: 800 })} alt="" loading="lazy" />
               ) : (
                 <CatPlaceholder />
               )}
@@ -205,7 +222,7 @@ function SlidesSection({ slides, title, subtitle, seeAllLink = "/shop" }: { slid
   const { t } = useLang();
   if (!slides.length) return null;
   return (
-    <section className="wrap">
+    <section className="wrap" data-reveal>
       <div className="section-head">
         <div><h2 className="text-heading">{title}</h2>{subtitle && <p>{subtitle}</p>}</div>
         <a href={seeAllLink} className="btn btn-outline btn-sm">{t("see_all")}</a>
@@ -243,7 +260,7 @@ function WhyUs({ items: dbItems, lang, t }: { items: WhyItem[]; lang: string; t:
   const hKey = lang === "ar" ? "headingAr" : lang === "en" ? "headingEn" : "headingFr" as keyof WhyItem;
   const pKey = lang === "ar" ? "paragraphAr" : lang === "en" ? "paragraphEn" : "paragraphFr" as keyof WhyItem;
   return (
-    <section className="wrap">
+    <section className="wrap" data-reveal>
       <div className="section-head"><div><h2 className="text-heading">{t("why_title")}</h2></div></div>
       <div className="why-grid">
         {items.map((item, i) => (
@@ -267,7 +284,7 @@ function FAQSection({ faqs: dbFaqs, lang, t }: { faqs: FaqEntry[]; lang: string;
   const aKey = lang === "ar" ? "answerAr" : lang === "en" ? "answerEn" : "answerFr" as keyof FaqEntry;
 
   return (
-    <section className="wrap" id="faq">
+    <section className="wrap" id="faq" data-reveal>
       <div className="section-head"><div><h2 className="text-heading">{t("faq_title")}</h2></div></div>
       <div>
         {faqs.map((f, i) => (
@@ -331,6 +348,8 @@ export default function HomePage() {
     }).catch(() => {});
   }, []);
 
+  useScrollReveal();
+
   function showToast(msg: string) {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(""), 2600);
@@ -367,19 +386,21 @@ export default function HomePage() {
           seeAllLink="/shop"
         />
       ) : (
-        <section className="wrap">
+        <section className="wrap" data-reveal>
           <div className="section-head">
-            <div><h2 className="text-heading">{t("new_title")}</h2><p>{t("new_sub")}</p></div>
-            <a href="/shop" className="btn btn-outline btn-sm">{t("see_all")}</a>
+            <div><h2 className="text-heading">{t("new_title")}</h2></div>
           </div>
-          <div className="grid-products">
+          <div className="grid-products cols-3">
             {productsError ? (
               <p style={{ color: "var(--steel)", fontSize: 13, gridColumn: "1 / -1", textAlign: "center", padding: 40 }}>{t("home_products_error")}</p>
             ) : (
-              [...products].sort((a, b) => (a.position || 0) - (b.position || 0)).slice(0, 4).map((p) => (
+              [...products].sort((a, b) => (a.position || 0) - (b.position || 0)).slice(0, 6).map((p) => (
                 <ProductCard key={p.id} product={p} onClick={() => setSelectedProduct(p)} />
               ))
             )}
+          </div>
+          <div style={{ marginTop: 32, textAlign: "center" }}>
+            <a href="/shop" className="btn btn-outline" style={{ padding: "14px 48px", fontSize: 12 }}>{t("see_all")}</a>
           </div>
         </section>
       )}

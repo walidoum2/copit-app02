@@ -219,6 +219,7 @@ section { padding: 80px 0; }
 
 /* Product Grid & Card */
 .grid-products { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.grid-products.cols-3 { grid-template-columns: repeat(3, 1fr); }
 .pcard { background: var(--bg2); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; cursor: pointer; transition: transform .18s ease, border-color .18s ease; }
 .pcard:hover { transform: translateY(-4px); border-color: rgba(200, 200, 200, 0.4); }
 .pcard-img { aspect-ratio: 1/1; position: relative; display: flex; align-items: center; justify-content: center; background: linear-gradient(155deg, var(--sw1, #f0f0ec), var(--sw2, #e0e0db)); overflow: hidden; }
@@ -789,21 +790,29 @@ footer { background: var(--bg); border-top: 1px solid var(--line); padding: 60px
 .section-head h2 { font-size: clamp(28px, 3.5vw, 40px); }
 .section-head p { color: var(--steel); font-size: 13px; margin-top: 6px; letter-spacing: 0.3px; }
 
-/* Staggered product card entrance */
-.grid-products .pcard { animation: fadeUp 0.5s ease both; }
-.grid-products .pcard:nth-child(1) { animation-delay: 0.05s; }
-.grid-products .pcard:nth-child(2) { animation-delay: 0.1s; }
-.grid-products .pcard:nth-child(3) { animation-delay: 0.15s; }
-.grid-products .pcard:nth-child(4) { animation-delay: 0.2s; }
-.grid-products .pcard:nth-child(5) { animation-delay: 0.25s; }
-.grid-products .pcard:nth-child(6) { animation-delay: 0.3s; }
-.grid-products .pcard:nth-child(7) { animation-delay: 0.35s; }
-.grid-products .pcard:nth-child(8) { animation-delay: 0.4s; }
+@media (prefers-reduced-motion: no-preference) {
+  /* Staggered product card entrance */
+  .grid-products .pcard { animation: fadeUp 0.5s ease both; }
+  .grid-products .pcard:nth-child(1) { animation-delay: 0.05s; }
+  .grid-products .pcard:nth-child(2) { animation-delay: 0.1s; }
+  .grid-products .pcard:nth-child(3) { animation-delay: 0.15s; }
+  .grid-products .pcard:nth-child(4) { animation-delay: 0.2s; }
+  .grid-products .pcard:nth-child(5) { animation-delay: 0.25s; }
+  .grid-products .pcard:nth-child(6) { animation-delay: 0.3s; }
+  .grid-products .pcard:nth-child(7) { animation-delay: 0.35s; }
+  .grid-products .pcard:nth-child(8) { animation-delay: 0.4s; }
 
-/* Scroll-triggered entrance animation */
-@keyframes revealUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-.reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease, transform 0.5s ease; }
-.reveal.visible { opacity: 1; transform: translateY(0); }
+  /* Hero entrance animation */
+  .hero-animate { opacity: 0; transform: translateY(16px); animation: heroFadeUp 0.5s ease-out forwards; }
+  .hero-animate-d1 { animation-delay: 0.1s; }
+  .hero-animate-d2 { animation-delay: 0.2s; }
+  .hero-animate-d3 { animation-delay: 0.3s; }
+  @keyframes heroFadeUp { to { opacity: 1; transform: translateY(0); } }
+
+  /* Scroll-triggered section entrance */
+  [data-reveal] { opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease-out, transform 0.5s ease-out; }
+  [data-reveal].visible { opacity: 1; transform: translateY(0); }
+}
 
 /* Cart quantity button micro-interaction */
 .qty-row button { transition: all 0.15s ease; }
