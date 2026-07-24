@@ -7,8 +7,8 @@ import { useLang } from "@/contexts/LangContext";
 /*  Types                                                             */
 /* ------------------------------------------------------------------ */
 interface FaqItem { id?: string; order: number; questionFr: string; questionAr: string; questionEn: string; answerFr: string; answerAr: string; answerEn: string; active: boolean; }
-interface WhyUsItem { id?: string; order: number; icon: string; headingFr: string; headingAr: string; headingEn: string; paragraphFr: string; paragraphAr: string; paragraphEn: string; active: boolean; }
-interface BrandItem { id?: string; name: string; hot: boolean; active: boolean; order: number; }
+interface WhyUsItem { id?: string; order: number; icon: string; imageUrl?: string; headingFr: string; headingAr: string; headingEn: string; paragraphFr: string; paragraphAr: string; paragraphEn: string; active: boolean; }
+interface BrandItem { id?: string; name: string; logoUrl?: string; hot: boolean; active: boolean; order: number; }
 interface CategoryContentItem { id?: string; nameFr: string; nameAr: string; nameEn: string; slug: string; imageUrl?: string; active: boolean; order: number; }
 interface FooterLinkItem { id?: string; section: string; labelFr: string; labelAr: string; labelEn: string; url: string; order: number; active: boolean; }
 
@@ -19,7 +19,7 @@ const ICONS = ["check", "truck", "map", "refresh"];
 const EMPTY: Record<ContentType, any> = {
   faq: { order: 0, questionFr: "", questionAr: "", questionEn: "", answerFr: "", answerAr: "", answerEn: "", active: true },
   whyus: { order: 0, icon: "check", headingFr: "", headingAr: "", headingEn: "", paragraphFr: "", paragraphAr: "", paragraphEn: "", active: true },
-  brands: { name: "", hot: false, active: true, order: 0 },
+  brands: { name: "", logoUrl: "", hot: false, active: true, order: 0 },
   categories: { nameFr: "", nameAr: "", nameEn: "", slug: "", imageUrl: "", active: true, order: 0 },
   footer: { section: "shop", labelFr: "", labelAr: "", labelEn: "", url: "", order: 0, active: true },
 };
@@ -73,6 +73,21 @@ function WhyUsEditor({ item, onSave, onCancel }: { item: WhyUsItem; onSave: (i: 
   const { t } = useLang();
   const [f, setF] = useState<WhyUsItem>(() => JSON.parse(JSON.stringify(item)));
   const set = (k: keyof WhyUsItem, v: any) => setF({ ...f, [k]: v });
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = "";
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.url) set("imageUrl", data.url);
+    } catch {}
+  }
+
   return (
     <div style={{ background: "var(--ink2)", border: "1px solid var(--line)", borderRadius: 2, padding: 20, margin: "12px 0" }}>
       <div className="frow"><div className="field"><label>{t("admin_content_fr")} {t("admin_content_heading")}</label><input value={f.headingFr} onChange={e => set("headingFr", e.target.value)} /></div>
@@ -81,6 +96,21 @@ function WhyUsEditor({ item, onSave, onCancel }: { item: WhyUsItem; onSave: (i: 
       <div className="frow"><div className="field"><label>{t("admin_content_fr")} {t("admin_content_paragraph")}</label><textarea rows={2} value={f.paragraphFr} onChange={e => set("paragraphFr", e.target.value)} /></div>
       <div className="field"><label>{t("admin_content_ar")} {t("admin_content_paragraph")}</label><textarea rows={2} value={f.paragraphAr} onChange={e => set("paragraphAr", e.target.value)} /></div>
       <div className="field"><label>{t("admin_content_en")} {t("admin_content_paragraph")}</label><textarea rows={2} value={f.paragraphEn} onChange={e => set("paragraphEn", e.target.value)} /></div></div>
+      <div style={{ marginTop: 10 }}>
+        <label style={{ fontSize: 11, letterSpacing: 1, textTransform: "uppercase", color: "var(--steel)", fontWeight: 700 }}>Image</label>
+        <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 6 }}>
+          {f.imageUrl ? (
+            <div style={{ width: 80, height: 80, border: "1px solid var(--line)", borderRadius: 2, overflow: "hidden", position: "relative", background: "var(--bg)" }}>
+              <img src={f.imageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              <button type="button" onClick={() => set("imageUrl", "")} style={{ position: "absolute", top: 2, right: 2, width: 18, height: 18, background: "rgba(0,0,0,0.7)", border: "none", color: "#fff", fontSize: 11, borderRadius: "50%", cursor: "pointer" }}>×</button>
+            </div>
+          ) : (
+            <label style={{ width: 80, height: 80, border: "1px dashed var(--line)", borderRadius: 2, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 22, color: "var(--steel)" }}>
+              +<input type="file" accept="image/*" style={{ display: "none" }} onChange={handleImageUpload} />
+            </label>
+          )}
+        </div>
+      </div>
       <div style={{ display: "flex", gap: 16, alignItems: "center", marginTop: 12 }}>
         <label style={{ fontSize: 11, color: "var(--steel)" }}>{t("admin_content_icon")}: <select value={f.icon} onChange={e => set("icon", e.target.value)} style={{ background: "var(--ink)", border: "1px solid var(--line)", color: "var(--bone)", padding: "4px 6px", fontSize: 12, borderRadius: 2, marginLeft: 6 }}>{ICONS.map(i => <option key={i} value={i}>{i}</option>)}</select></label>
         <IconSvg name={f.icon} size={22} />
@@ -99,11 +129,41 @@ function BrandsEditor({ item, onSave, onCancel }: { item: BrandItem; onSave: (i:
   const { t } = useLang();
   const [f, setF] = useState<BrandItem>(() => JSON.parse(JSON.stringify(item)));
   const set = (k: keyof BrandItem, v: any) => setF({ ...f, [k]: v });
+
+  async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = "";
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.url) set("logoUrl", data.url);
+    } catch {}
+  }
+
   return (
     <div style={{ background: "var(--ink2)", border: "1px solid var(--line)", borderRadius: 2, padding: 20, margin: "12px 0" }}>
       <div className="frow">
         <div className="field"><label>{t("admin_content_name")}</label><input value={f.name} onChange={e => set("name", e.target.value)} /></div>
         <div className="field"><label>{t("admin_content_order")}</label><input type="number" value={f.order} onChange={e => set("order", +e.target.value)} /></div>
+      </div>
+      <div style={{ marginTop: 8 }}>
+        <label style={{ fontSize: 11, letterSpacing: 1, textTransform: "uppercase", color: "var(--steel)", fontWeight: 700 }}>Logo</label>
+        <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 6 }}>
+          {f.logoUrl ? (
+            <div style={{ width: 80, height: 80, border: "1px solid var(--line)", borderRadius: 2, overflow: "hidden", position: "relative", background: "var(--bg)" }}>
+              <img src={f.logoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 8 }} />
+              <button type="button" onClick={() => set("logoUrl", "")} style={{ position: "absolute", top: 2, right: 2, width: 18, height: 18, background: "rgba(0,0,0,0.7)", border: "none", color: "#fff", fontSize: 11, borderRadius: "50%", cursor: "pointer" }}>×</button>
+            </div>
+          ) : (
+            <label style={{ width: 80, height: 80, border: "1px dashed var(--line)", borderRadius: 2, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 22, color: "var(--steel)" }}>
+              +<input type="file" accept="image/*" style={{ display: "none" }} onChange={handleLogoUpload} />
+            </label>
+          )}
+        </div>
       </div>
       <div style={{ display: "flex", gap: 16, alignItems: "center", marginTop: 8 }}>
         <label style={{ fontSize: 11, color: "var(--steel)", display: "flex", alignItems: "center", gap: 6 }}><input type="checkbox" checked={f.hot} onChange={e => set("hot", e.target.checked)} /> {t("admin_content_hot")}</label>

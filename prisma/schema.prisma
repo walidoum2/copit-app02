@@ -121,6 +121,7 @@ model WhyUsItem {
   id         String   @id @default(cuid())
   order      Int      @default(0)
   icon       String   @default("check")
+  imageUrl   String?
   headingFr  String
   headingAr  String
   headingEn  String
@@ -135,6 +136,7 @@ model WhyUsItem {
 model BrandItem {
   id        String   @id @default(cuid())
   name      String
+  logoUrl   String?
   hot       Boolean  @default(false)
   active    Boolean  @default(true)
   order     Int      @default(0)

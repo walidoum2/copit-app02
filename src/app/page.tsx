@@ -76,15 +76,16 @@ function HeroSection({ settings }: { settings: Record<string, string> }) {
 
 const FALLBACK_BRANDS = ["Dr. Martens", "Under Armour", "Puma", "Osiris", "Jordan", "CopIt Basics"];
 
-function Marquee({ brands: dbBrands }: { brands: { name: string; hot: boolean }[] }) {
-  const brands = dbBrands.length > 0 ? dbBrands : FALLBACK_BRANDS.map(n => ({ name: n, hot: false }));
+function Marquee({ brands: dbBrands }: { brands: { name: string; hot: boolean; logoUrl?: string }[] }) {
+  const brands = dbBrands.length > 0 ? dbBrands : FALLBACK_BRANDS.map(n => ({ name: n, hot: false, logoUrl: undefined }));
   return (
     <div className="marquee">
       <div className="marquee-track">
         {[0, 1].map((i) =>
           brands.map((b, idx) => (
             <span key={`${i}-${idx}`} className={b.hot ? "hot" : ""}>
-              {b.name} <span style={{ color: "var(--cop)" }}>✕ </span>
+              {b.logoUrl ? <img src={b.logoUrl} alt={b.name} className="brand-logo" /> : b.name}
+              <span style={{ color: "var(--cop)" }}> ✕ </span>
             </span>
           ))
         )}
@@ -250,7 +251,7 @@ function WhyIcon({ name }: { name: string }) {
 }
 
 function WhyUs({ items: dbItems, lang, t }: { items: WhyItem[]; lang: string; t: (k: string) => string }) {
-  const fallback = [
+  const fallback: WhyItem[] = [
     { icon: "check", headingFr: t("why1_h"), headingAr: t("why1_h"), headingEn: t("why1_h"), paragraphFr: t("why1_p"), paragraphAr: t("why1_p"), paragraphEn: t("why1_p") },
     { icon: "truck", headingFr: t("why2_h"), headingAr: t("why2_h"), headingEn: t("why2_h"), paragraphFr: t("why2_p"), paragraphAr: t("why2_p"), paragraphEn: t("why2_p") },
     { icon: "map", headingFr: t("why3_h"), headingAr: t("why3_h"), headingEn: t("why3_h"), paragraphFr: t("why3_p"), paragraphAr: t("why3_p"), paragraphEn: t("why3_p") },
@@ -265,7 +266,11 @@ function WhyUs({ items: dbItems, lang, t }: { items: WhyItem[]; lang: string; t:
       <div className="why-grid">
         {items.map((item, i) => (
           <div key={i} className="why-item">
-            <WhyIcon name={item.icon} />
+            {item.imageUrl ? (
+              <div className="why-img-wrap"><img src={item.imageUrl} alt="" className="why-img" /></div>
+            ) : (
+              <WhyIcon name={item.icon} />
+            )}
             <h4>{item[hKey]}</h4>
             <p>{item[pKey]}</p>
           </div>
@@ -301,7 +306,7 @@ function FAQSection({ faqs: dbFaqs, lang, t }: { faqs: FaqEntry[]; lang: string;
   );
 }
 
-interface WhyItem { icon: string; headingFr: string; headingAr: string; headingEn: string; paragraphFr: string; paragraphAr: string; paragraphEn: string; }
+interface WhyItem { icon: string; imageUrl?: string; headingFr: string; headingAr: string; headingEn: string; paragraphFr: string; paragraphAr: string; paragraphEn: string; }
 
 export default function HomePage() {
   const [cartOpen, setCartOpen] = useState(false);
@@ -311,7 +316,7 @@ export default function HomePage() {
   const [productsError, setProductsError] = useState(false);
   const [faqs, setFaqs] = useState<FaqEntry[]>([]);
   const [whyus, setWhyus] = useState<WhyItem[]>([]);
-  const [brands, setBrands] = useState<{ name: string; hot: boolean }[]>([]);
+  const [brands, setBrands] = useState<{ name: string; hot: boolean; logoUrl?: string }[]>([]);
   const [categories, setCategories] = useState<CatItem[]>([]);
   const [newArrivalSlides, setNewArrivalSlides] = useState<SlideItem[]>([]);
   const [promotionSlides, setPromotionSlides] = useState<SlideItem[]>([]);
