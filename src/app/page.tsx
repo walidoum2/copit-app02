@@ -78,8 +78,25 @@ function Marquee({ brands: dbBrands }: { brands: { name: string; hot: boolean }[
 
 interface CatItem { nameFr: string; nameAr: string; nameEn: string; slug: string; imageUrl?: string; }
 
+const FALLBACK_CATS: CatItem[] = [
+  { nameFr: "Chaussures", nameAr: "أحذية", nameEn: "Shoes", slug: "Chaussures" },
+  { nameFr: "Vêtements", nameAr: "ملابس", nameEn: "Clothing", slug: "Vêtements" },
+  { nameFr: "Accessoires", nameAr: "إكسسوارات", nameEn: "Accessories", slug: "Accessoires" },
+  { nameFr: "Lifestyle", nameAr: "لايف ستايل", nameEn: "Lifestyle", slug: "Lifestyle" },
+];
+
+function CatPlaceholder() {
+  return (
+    <svg className="cat-card-placeholder" viewBox="0 0 80 80" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <rect x="8" y="16" width="64" height="48" rx="4" />
+      <circle cx="30" cy="36" r="8" />
+      <path d="M8 54l18-14 14 12 12-10 20 16" />
+    </svg>
+  );
+}
+
 function Categories({ categories: dbCats, lang, t }: { categories: CatItem[]; lang: string; t: (k: string) => string }) {
-  const cats = dbCats.length > 0 ? dbCats : [{ nameFr: "Chaussures", nameAr: "أحذية", nameEn: "Shoes", slug: "Chaussures" },{ nameFr: "Vêtements", nameAr: "ملابس", nameEn: "Clothing", slug: "Vêtements" },{ nameFr: "Accessoires", nameAr: "إكسسوارات", nameEn: "Accessories", slug: "Accessoires" }];
+  const cats = dbCats.length > 0 ? dbCats : FALLBACK_CATS;
   const nameKey = lang === "ar" ? "nameAr" : lang === "en" ? "nameEn" : "nameFr" as keyof CatItem;
   return (
     <section className="wrap">
@@ -89,20 +106,17 @@ function Categories({ categories: dbCats, lang, t }: { categories: CatItem[]; la
       <div className="cat-grid">
         {cats.map((cat) => (
           <a key={cat.slug} href={`/shop?category=${encodeURIComponent(cat.slug)}`} className="cat-card">
-            {cat.imageUrl ? (
-              <>
-                <img src={optimizeCldUrl(cat.imageUrl, { w: 400 })} alt="" loading="lazy" className="cat-card-img" />
-                <div className="cat-card-overlay cat-card-img-overlay">
-                  <h3>{cat[nameKey]}</h3>
-                  <p>{t("shop_title")} →</p>
-                </div>
-              </>
-            ) : (
-              <div className="cat-card-overlay">
-                <h3>{cat[nameKey]}</h3>
-                <p>{t("shop_title")} →</p>
-              </div>
-            )}
+            <div className="cat-card-img-wrap">
+              {cat.imageUrl ? (
+                <img src={optimizeCldUrl(cat.imageUrl, { w: 400 })} alt="" loading="lazy" />
+              ) : (
+                <CatPlaceholder />
+              )}
+            </div>
+            <div className="cat-card-body">
+              <h3>{cat[nameKey]}</h3>
+              <p>{t("shop_title")} →</p>
+            </div>
           </a>
         ))}
       </div>

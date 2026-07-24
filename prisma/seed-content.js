@@ -31,6 +31,7 @@ const CATEGORIES = [
   { nameFr: "Chaussures", nameAr: "أحذية", nameEn: "Shoes", slug: "Chaussures", order: 1 },
   { nameFr: "Vêtements", nameAr: "ملابس", nameEn: "Clothing", slug: "Vêtements", order: 2 },
   { nameFr: "Accessoires", nameAr: "إكسسوارات", nameEn: "Accessories", slug: "Accessoires", order: 3 },
+  { nameFr: "Lifestyle", nameAr: "لايف ستايل", nameEn: "Lifestyle", slug: "Lifestyle", order: 4 },
 ];
 
 const FOOTER_LINKS = [

@@ -200,13 +200,14 @@ function FooterEditor({ item, onSave, onCancel }: { item: FooterLinkItem; onSave
 /*  Generic list + editor wrapper                                     */
 /* ------------------------------------------------------------------ */
 function ContentList<T extends { id?: string; active?: boolean }>({
-  items, Editor, renderLabel, onSave, onDelete, emptyLabel, addLabel, emptyItem,
+  items, Editor, renderLabel, onSave, onDelete, onMove, emptyLabel, addLabel, emptyItem,
 }: {
   items: T[];
   Editor: (props: { item: T; onSave: (i: T) => void; onCancel: () => void }) => React.ReactNode;
   renderLabel: (item: T) => string;
   onSave: (item: T) => void;
   onDelete: (id: string) => void;
+  onMove?: (id: string, dir: "up" | "down") => void;
   emptyLabel: string;
   addLabel: string;
   emptyItem: T;
@@ -230,7 +231,13 @@ function ContentList<T extends { id?: string; active?: boolean }>({
           ) : (
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 12px", borderBottom: "1px solid var(--line)", fontSize: 13 }}>
               <span style={{ color: item.active ? "var(--bone)" : "var(--steel)" }}>{renderLabel(item)}</span>
-              <div style={{ display: "flex", gap: 6 }}>
+              <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                {onMove && (
+                  <span style={{ display: "flex", gap: 2, marginRight: 4 }}>
+                    <button onClick={() => onMove(item.id!, "up")} style={{ background: "none", border: "1px solid var(--line)", color: "var(--steel)", width: 22, height: 22, borderRadius: 2, cursor: "pointer", fontSize: 10, lineHeight: 1, padding: 0 }}>▲</button>
+                    <button onClick={() => onMove(item.id!, "down")} style={{ background: "none", border: "1px solid var(--line)", color: "var(--steel)", width: 22, height: 22, borderRadius: 2, cursor: "pointer", fontSize: 10, lineHeight: 1, padding: 0 }}>▼</button>
+                  </span>
+                )}
                 <SectionBtn label="Edit" onClick={() => { setEditingId(item.id!); setAdding(false); }} />
                 <SectionBtn label="Del" onClick={() => { if (confirm("Delete?")) onDelete(item.id!); }} />
               </div>
@@ -286,6 +293,24 @@ export default function AdminContent() {
 
   async function del(type: ContentType, id: string) {
     await fetch(`/api/admin/content?type=${type}&id=${id}`, { method: "DELETE" });
+    loadAll();
+  }
+
+  async function moveCategory(id: string, dir: "up" | "down") {
+    const sorted = [...categories].sort((a, b) => a.order - b.order);
+    const idx = sorted.findIndex(c => c.id === id);
+    if (idx === -1) return;
+    if (dir === "up" && idx === 0) return;
+    if (dir === "down" && idx === sorted.length - 1) return;
+    const swapIdx = dir === "up" ? idx - 1 : idx + 1;
+    [sorted[idx].order, sorted[swapIdx].order] = [sorted[swapIdx].order, sorted[idx].order];
+    await Promise.all(sorted.map(c =>
+      fetch("/api/admin/content?type=categories", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: c.id, order: c.order }),
+      })
+    ));
     loadAll();
   }
 
@@ -351,9 +376,10 @@ export default function AdminContent() {
           items={categories}
           Editor={CategoriesEditor}
           emptyItem={{ nameFr: "", nameAr: "", nameEn: "", slug: "", active: true, order: categories.length } as CategoryContentItem}
-          renderLabel={(f: CategoryContentItem) => `${f.nameFr || f.nameEn || f.nameAr} (${f.slug})`}
+          renderLabel={(f: CategoryContentItem) => `${f.order}. ${f.nameFr || f.nameEn || f.nameAr} (${f.slug})`}
           onSave={(i) => save("categories", i)}
           onDelete={(id) => del("categories", id)}
+          onMove={moveCategory}
           emptyLabel="No categories yet."
           addLabel={t("admin_content_add")}
         />
