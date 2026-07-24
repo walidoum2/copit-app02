@@ -66,16 +66,6 @@ function Marquee() {
 
 interface CatItem { nameFr: string; nameAr: string; nameEn: string; slug: string; imageUrl?: string; wide?: boolean; }
 
-function CatPlaceholder() {
-  return (
-    <svg className="cat-card-placeholder" viewBox="0 0 80 80" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <rect x="8" y="16" width="64" height="48" rx="4" />
-      <circle cx="30" cy="36" r="8" />
-      <path d="M8 54l18-14 14 12 12-10 20 16" />
-    </svg>
-  );
-}
-
 function Categories({ categories: dbCats, lang, t }: { categories: CatItem[]; lang: string; t: (k: string) => string }) {
   const nameKey = lang === "ar" ? "nameAr" : lang === "en" ? "nameEn" : "nameFr" as keyof CatItem;
   const cats = dbCats.length > 0 ? dbCats : [
@@ -91,16 +81,29 @@ function Categories({ categories: dbCats, lang, t }: { categories: CatItem[]; la
       <div className="cat-grid">
         {cats.map((cat) => (
           <a key={cat.slug} href={`/shop?category=${encodeURIComponent(cat.slug)}`} className={`cat-card${cat.wide ? " wide" : ""}`}>
-            <div className="cat-card-img-wrap">
+            <div className="cat-card-inner" style={cat.imageUrl ? {} : { background: "var(--bg2)" }}>
               {cat.imageUrl ? (
-                <img src={optimizeCldUrl(cat.imageUrl, { w: 800 })} alt="" loading="lazy" />
+                <>
+                  <img src={optimizeCldUrl(cat.imageUrl, { w: 800 })} alt="" className="cat-card-bg" loading="lazy" />
+                  <div className="cat-card-overlay" />
+                  <div className="cat-card-content">
+                    <h3>{cat[nameKey]}</h3>
+                    <p>LE SHOP →</p>
+                  </div>
+                </>
               ) : (
-                <CatPlaceholder />
+                <>
+                  <svg className="cat-card-icon-only" viewBox="0 0 80 80" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <rect x="8" y="16" width="64" height="48" rx="4" />
+                    <circle cx="30" cy="36" r="8" />
+                    <path d="M8 54l18-14 14 12 12-10 20 16" />
+                  </svg>
+                  <div className="cat-card-content" style={{ color: "var(--text)" }}>
+                    <h3 style={{ color: "var(--text)", textShadow: "none" }}>{cat[nameKey]}</h3>
+                    <p style={{ color: "var(--steel)" }}>LE SHOP →</p>
+                  </div>
+                </>
               )}
-            </div>
-            <div className="cat-card-body">
-              <h3>{cat[nameKey]}</h3>
-              <p>LE SHOP →</p>
             </div>
           </a>
         ))}
@@ -376,11 +379,11 @@ export default function HomePage() {
           <div className="section-head">
             <div><h2 className="text-heading">{t("new_title")}</h2></div>
           </div>
-          <div className="grid-products cols-3">
+          <div className="grid-products cols-4">
             {productsError ? (
               <p style={{ color: "var(--steel)", fontSize: 13, gridColumn: "1 / -1", textAlign: "center", padding: 40 }}>{t("home_products_error")}</p>
             ) : (
-              [...products].sort((a, b) => (a.position || 0) - (b.position || 0)).slice(0, 6).map((p) => (
+              [...products].sort((a, b) => (a.position || 0) - (b.position || 0)).slice(0, 4).map((p) => (
                 <ProductCard key={p.id} product={p} onClick={() => setSelectedProduct(p)} />
               ))
             )}
