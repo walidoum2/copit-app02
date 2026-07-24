@@ -37,7 +37,7 @@ function HeroSection({ settings }: { settings: Record<string, string> }) {
       <div className="wrap">
         <h1 className="hero-slogan">
           {S("hero_title", "LIKE IT. WANT IT. COP IT.").split(".").filter(Boolean).map((part, i, arr) => (
-            <span key={i}>{part.trim()}<span className="dot">.</span>{i < arr.length - 1 ? " " : ""}</span>
+            <span key={i}>{part.trim()}<span className="hero-dot">.</span>{i < arr.length - 1 ? " " : ""}</span>
           ))}
         </h1>
         <div className="hero-actions">
@@ -239,6 +239,12 @@ function WhyUs({ items: dbItems, lang, t }: { items: WhyItem[]; lang: string; t:
             ) : (
               <WhyIcon name={item.icon} size={28} />
             )}
+            {i === 0 && (
+              <div className="why-auth-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+                <span>{lang === "ar" ? "أصلي مضمون" : "AUTHENTICITÉ VÉRIFIÉE"}</span>
+              </div>
+            )}
             <h4>{item[hKey]}</h4>
             <p>{item[pKey]}</p>
           </div>
@@ -348,6 +354,13 @@ export default function HomePage() {
       </div>
 
       <HeroSection settings={landingSettings} />
+      <div className="offer-banner">
+        <div className="offer-banner-inner">
+          <span className="offer-banner-tag">{lang === "ar" ? "عرض خاص" : "SPECIAL OFFER"}</span>
+          <span className="offer-banner-text">{lang === "ar" ? "خصم يصل إلى 50٪ على منتجات مختارة" : "UP TO 50% OFF ON SELECTED ITEMS"}</span>
+          <a href="/shop?promo=true" className="offer-banner-btn">{t("promo_btn")}</a>
+        </div>
+      </div>
       <Marquee />
       <Categories categories={categories} lang={lang} t={t} />
 
