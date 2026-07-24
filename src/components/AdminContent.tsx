@@ -72,7 +72,7 @@ function FaqEditor({ item, onSave, onCancel }: { item: FaqItem; onSave: (i: FaqI
 function WhyUsEditor({ item, onSave, onCancel }: { item: WhyUsItem; onSave: (i: WhyUsItem) => void; onCancel: () => void }) {
   const { t } = useLang();
   const [f, setF] = useState<WhyUsItem>(() => JSON.parse(JSON.stringify(item)));
-  const set = (k: keyof WhyUsItem, v: any) => setF({ ...f, [k]: v });
+  const set = (k: keyof WhyUsItem, v: any) => setF(prev => ({ ...prev, [k]: v }));
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -128,7 +128,7 @@ function WhyUsEditor({ item, onSave, onCancel }: { item: WhyUsItem; onSave: (i: 
 function BrandsEditor({ item, onSave, onCancel }: { item: BrandItem; onSave: (i: BrandItem) => void; onCancel: () => void }) {
   const { t } = useLang();
   const [f, setF] = useState<BrandItem>(() => JSON.parse(JSON.stringify(item)));
-  const set = (k: keyof BrandItem, v: any) => setF({ ...f, [k]: v });
+  const set = (k: keyof BrandItem, v: any) => setF(prev => ({ ...prev, [k]: v }));
 
   async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -180,7 +180,7 @@ function BrandsEditor({ item, onSave, onCancel }: { item: BrandItem; onSave: (i:
 function CategoriesEditor({ item, onSave, onCancel }: { item: CategoryContentItem; onSave: (i: CategoryContentItem) => void; onCancel: () => void }) {
   const { t } = useLang();
   const [f, setF] = useState<CategoryContentItem>(() => JSON.parse(JSON.stringify(item)));
-  const set = (k: keyof CategoryContentItem, v: any) => setF({ ...f, [k]: v });
+  const set = (k: keyof CategoryContentItem, v: any) => setF(prev => ({ ...prev, [k]: v }));
 
   async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
