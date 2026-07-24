@@ -7,7 +7,7 @@ import { useState, useEffect, type JSX } from "react";
 
 function MenuIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
       <path d="M3 6h18M3 12h18M3 18h18" />
     </svg>
   );
@@ -15,7 +15,7 @@ function MenuIcon() {
 
 function CloseIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
       <path d="M18 6L6 18M6 6l12 12" />
     </svg>
   );
@@ -33,13 +33,17 @@ export default function Header({ onCartOpen }: { onCartOpen: () => void }) {
   const { lang, setLang, t } = useLang();
   const { count } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const [logoErr, setLogoErr] = useState(false);
+  const [clockStr, setClockStr] = useState("13:56");
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 10);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const now = new Date();
+    setClockStr(String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0"));
+    const interval = setInterval(() => {
+      const n = new Date();
+      setClockStr(String(n.getHours()).padStart(2, "0") + ":" + String(n.getMinutes()).padStart(2, "0"));
+    }, 60000);
+    return () => clearInterval(interval);
   }, []);
 
   const navLinks = [
@@ -51,31 +55,46 @@ export default function Header({ onCartOpen }: { onCartOpen: () => void }) {
   ];
 
   return (
-    <header className={`header${scrolled ? " scrolled" : ""}`}>
+    <header className="header">
+      <div className="status-bar">
+        <span className="sb-left">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+        </span>
+        <span>{clockStr}</span>
+        <span className="sb-right">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="6" width="22" height="12" rx="2" /><path d="M23 10v4" /></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="7" width="4" height="10" /><rect x="8" y="5" width="4" height="14" /><rect x="14" y="3" width="4" height="18" /><rect x="20" y="9" width="2" height="6" /></svg>
+        </span>
+      </div>
       <div className="wrap nav">
         <div className="hdr-left">
           <button className="hamburger" onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
             {menuOpen ? <CloseIcon /> : <MenuIcon />}
           </button>
-          <Link href="/" className="logo" aria-label="CopIt Home">
-            {logoErr ? (
-              <span className="display" style={{ fontSize: 20, letterSpacing: 1 }}>COP<span style={{ color: "var(--cop)" }}>IT</span></span>
-            ) : (
-              <img src="/logo.png" alt="COPIT" className="logo-img" onError={() => setLogoErr(true)} />
-            )}
-          </Link>
         </div>
-        <nav className="navlinks">
-          {navLinks.map((l) => (
-            <Link key={l.key} href={l.href}>{l.label}</Link>
-          ))}
-        </nav>
+        <Link href="/" className="logo" aria-label="CopIt Home">
+          {logoErr ? (
+            <span className="logo-text">COP<span style={{ color: "var(--cop)" }}>IT</span></span>
+          ) : (
+            <>
+              <img src="/logo.png" alt="COPIT" className="logo-img" onError={() => setLogoErr(true)} />
+              <span className="logo-text">COP<span style={{ color: "var(--cop)" }}>IT</span></span>
+            </>
+          )}
+        </Link>
         <div className="navright">
           <Link href="/shop" className="icon-btn" aria-label="Search">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
               <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
             </svg>
           </Link>
+          <button className="icon-btn" onClick={onCartOpen} aria-label="Cart">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
+              <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6" />
+            </svg>
+            {count > 0 && <span className="cart-badge">{count}</span>}
+          </button>
           <div className="langswitch">
             {(["fr", "ar"] as const).map((l) => (
               <button key={l} className={lang === l ? "active" : ""} onClick={() => setLang(l)} aria-label={l === "fr" ? "Français" : "العربية"}>
@@ -83,13 +102,6 @@ export default function Header({ onCartOpen }: { onCartOpen: () => void }) {
               </button>
             ))}
           </div>
-          <button className="icon-btn" onClick={onCartOpen} aria-label="Cart">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-              <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
-              <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6" />
-            </svg>
-            {count > 0 && <span className="cart-badge">{count}</span>}
-          </button>
         </div>
       </div>
 

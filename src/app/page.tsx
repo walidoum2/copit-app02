@@ -34,59 +34,29 @@ function HeroSection({ settings }: { settings: Record<string, string> }) {
   const S = (key: string, fallback: string) => settings[key] || fallback;
   return (
     <section className="hero">
-      <div className="wrap hero-grid">
-        <div>
-          <div className="hero-eyebrow hero-animate hero-animate-d1">{S("hero_eyebrow", "DROP EN COURS — 69 WILAYAS")}</div>
-          <h1 className="hero-title hero-animate hero-animate-d2">{S("hero_title", "LIKE IT. WANT IT. COP IT.")}</h1>
-          <p className="hero-body hero-animate hero-animate-d3">{t("hero_policy")}</p>
-          <div className="hero-actions hero-animate hero-animate-d3">
-            <a href="/shop?promo=true" className="btn btn-primary">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ width: 14, height: 14 }}><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
-              {t("promo_btn")}
-            </a>
-            <a href="/shop" className="btn btn-outline">{t("hero_cta1")}</a>
-          </div>
-          <div className="hero-trust">
-            <div className="hero-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 6L9 17l-5-5" /></svg><span>{t("badge1")}</span></div>
-            <div className="hero-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="3" width="15" height="13" /><path d="M16 8h4l3 3v5h-7V8z" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" /></svg><span>{t("badge2")}</span></div>
-            <div className="hero-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg><span>{t("badge3")}</span></div>
-          </div>
-        </div>
-        <div className="hero-visual">
-          {S("hero_visual_img", "") ? (
-            <img src={optimizeCldUrl(S("hero_visual_img", ""), { w: 800 })} alt="" fetchPriority="high" loading="eager" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-          ) : (
-            <svg viewBox="0 0 200 130" width="72%" fill="none" stroke="#E8E8E4" strokeWidth="1.4">
-              <path d="M10 95c0-8 8-14 18-16 12-2 20-10 30-14 14-6 30-6 42 2 6 4 10 4 18 2 14-4 30 0 42 10 8 6 12 8 20 8 6 0 8 4 8 8v8c0 4-3 7-7 7H17c-4 0-7-3-7-7v-8z" />
-              <path d="M40 95v-10M60 95v-14M85 95v-16" strokeDasharray="2 3" />
-            </svg>
-          )}
-          <div className="hero-visual-caption">
-            <div>
-              <div className="text-label" style={{ fontSize: 10, color: "var(--cop-dim)" }}>{S("hero_visual_sku", "SKU // CP-0192")}</div>
-              <div className="hero-visual-title">{S("hero_visual_title", "New Arrival")}</div>
-            </div>
-            <div className="hero-visual-stat">{S("hero_visual_stat", "28K+")}<br /><span className="hero-visual-stat-label">{S("hero_visual_stat_label", "COPPERS")}</span></div>
-          </div>
+      <div className="wrap">
+        <h1 className="hero-slogan">
+          {S("hero_title", "LIKE IT. WANT IT. COP IT.").split(".").filter(Boolean).map((part, i, arr) => (
+            <span key={i}>{part.trim()}<span className="dot">.</span>{i < arr.length - 1 ? " " : ""}</span>
+          ))}
+        </h1>
+        <div className="hero-actions">
+          <a href="/shop?promo=true" className="btn btn-primary">☆ {t("promo_btn")}</a>
+          <a href="/shop" className="btn btn-outline">{t("hero_cta1")}</a>
         </div>
       </div>
     </section>
   );
 }
 
-const FALLBACK_BRANDS = ["Dr. Martens", "Under Armour", "Puma", "Osiris", "Jordan", "CopIt Basics"];
-
-function Marquee({ brands: dbBrands }: { brands: { name: string; hot: boolean; logoUrl?: string }[] }) {
-  const brands = dbBrands.length > 0 ? dbBrands : FALLBACK_BRANDS.map(n => ({ name: n, hot: false, logoUrl: undefined }));
+function Marquee() {
+  const text = "NEW ARRIVAL ✕";
   return (
     <div className="marquee">
       <div className="marquee-track">
         {[0, 1].map((i) =>
-          brands.map((b, idx) => (
-            <span key={`${i}-${idx}`} className={b.hot ? "hot" : ""}>
-              {b.logoUrl ? <img src={b.logoUrl} alt={b.name} className="brand-logo" /> : b.name}
-              <span style={{ color: "var(--cop)" }}> ✕ </span>
-            </span>
+          [1, 2, 3, 4, 5, 6].map((_, idx) => (
+            <span key={`${i}-${idx}`}>{text}</span>
           ))
         )}
       </div>
@@ -94,14 +64,7 @@ function Marquee({ brands: dbBrands }: { brands: { name: string; hot: boolean; l
   );
 }
 
-interface CatItem { nameFr: string; nameAr: string; nameEn: string; slug: string; imageUrl?: string; }
-
-const FALLBACK_CATS: CatItem[] = [
-  { nameFr: "Chaussures", nameAr: "أحذية", nameEn: "Shoes", slug: "Chaussures" },
-  { nameFr: "Vêtements", nameAr: "ملابس", nameEn: "Clothing", slug: "Vêtements" },
-  { nameFr: "Accessoires", nameAr: "إكسسوارات", nameEn: "Accessories", slug: "Accessoires" },
-  { nameFr: "Lifestyle", nameAr: "لايف ستايل", nameEn: "Lifestyle", slug: "Lifestyle" },
-];
+interface CatItem { nameFr: string; nameAr: string; nameEn: string; slug: string; imageUrl?: string; wide?: boolean; }
 
 function CatPlaceholder() {
   return (
@@ -114,8 +77,12 @@ function CatPlaceholder() {
 }
 
 function Categories({ categories: dbCats, lang, t }: { categories: CatItem[]; lang: string; t: (k: string) => string }) {
-  const cats = dbCats.length > 0 ? dbCats : FALLBACK_CATS;
   const nameKey = lang === "ar" ? "nameAr" : lang === "en" ? "nameEn" : "nameFr" as keyof CatItem;
+  const cats = dbCats.length > 0 ? dbCats : [
+    { nameFr: "Sneakers", nameAr: "سنيكرز", nameEn: "Sneakers", slug: "Chaussures" },
+    { nameFr: "Vêtements", nameAr: "ملابس", nameEn: "Clothing", slug: "Vêtements" },
+    { nameFr: "Accessoires", nameAr: "إكسسوارات", nameEn: "Accessories", slug: "Accessoires", wide: true },
+  ] as CatItem[];
   return (
     <section className="wrap" data-reveal>
       <div className="section-head">
@@ -123,7 +90,7 @@ function Categories({ categories: dbCats, lang, t }: { categories: CatItem[]; la
       </div>
       <div className="cat-grid">
         {cats.map((cat) => (
-          <a key={cat.slug} href={`/shop?category=${encodeURIComponent(cat.slug)}`} className="cat-card">
+          <a key={cat.slug} href={`/shop?category=${encodeURIComponent(cat.slug)}`} className={`cat-card${cat.wide ? " wide" : ""}`}>
             <div className="cat-card-img-wrap">
               {cat.imageUrl ? (
                 <img src={optimizeCldUrl(cat.imageUrl, { w: 800 })} alt="" loading="lazy" />
@@ -133,7 +100,7 @@ function Categories({ categories: dbCats, lang, t }: { categories: CatItem[]; la
             </div>
             <div className="cat-card-body">
               <h3>{cat[nameKey]}</h3>
-              <p>{t("shop_title")} →</p>
+              <p>LE SHOP →</p>
             </div>
           </a>
         ))}
@@ -239,8 +206,9 @@ function SlidesSection({ slides, title, subtitle, seeAllLink = "/shop" }: { slid
   );
 }
 
-function WhyIcon({ name }: { name: string }) {
-  const props = { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "1.8", style: { width: 24, height: 24 } } as const;
+function WhyIcon({ name, size = 28 }: { name: string; size?: number }) {
+  const s = size;
+  const props = { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "1.8", style: { width: s, height: s } } as const;
   switch (name) {
     case "check": return <svg {...props}><path d="M20 6L9 17l-5-5" /></svg>;
     case "truck": return <svg {...props}><rect x="1" y="3" width="15" height="13" /><path d="M16 8h4l3 3v5h-7V8z" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" /></svg>;
@@ -252,10 +220,10 @@ function WhyIcon({ name }: { name: string }) {
 
 function WhyUs({ items: dbItems, lang, t }: { items: WhyItem[]; lang: string; t: (k: string) => string }) {
   const fallback: WhyItem[] = [
-    { icon: "check", headingFr: t("why1_h"), headingAr: t("why1_h"), headingEn: t("why1_h"), paragraphFr: t("why1_p"), paragraphAr: t("why1_p"), paragraphEn: t("why1_p") },
-    { icon: "truck", headingFr: t("why2_h"), headingAr: t("why2_h"), headingEn: t("why2_h"), paragraphFr: t("why2_p"), paragraphAr: t("why2_p"), paragraphEn: t("why2_p") },
-    { icon: "map", headingFr: t("why3_h"), headingAr: t("why3_h"), headingEn: t("why3_h"), paragraphFr: t("why3_p"), paragraphAr: t("why3_p"), paragraphEn: t("why3_p") },
-    { icon: "refresh", headingFr: t("why4_h"), headingAr: t("why4_h"), headingEn: t("why4_h"), paragraphFr: t("why4_p"), paragraphAr: t("why4_p"), paragraphEn: t("why4_p") },
+    { icon: "check", headingFr: "Original Garanti", headingAr: "أصلي مضمون", headingEn: "Authentic Guaranteed", paragraphFr: "Tous nos produits sont 100% authentiques, vérifiés et scellés.", paragraphAr: "جميع منتجاتنا أصلية 100%", paragraphEn: "All products 100% authentic" },
+    { icon: "truck", headingFr: "Paiement à la Livraison", headingAr: "الدفع عند الاستلام", headingEn: "Cash on Delivery", paragraphFr: "Payez uniquement lorsque vous recevez votre commande.", paragraphAr: "ادفع فقط عند استلام طلبك", paragraphEn: "Pay only when you receive" },
+    { icon: "map", headingFr: "69 Wilayas Couvertes", headingAr: "69 ولاية مغطاة", headingEn: "69 Wilayas Covered", paragraphFr: "Livraison rapide dans toute l'Algérie, des grandes villes aux zones reculées.", paragraphAr: "توصيل سريع في جميع أنحاء الجزائر", paragraphEn: "Fast delivery across Algeria" },
+    { icon: "refresh", headingFr: "Échange Facile", headingAr: "تبديل سهل", headingEn: "Easy Exchange", paragraphFr: "Satisfait ou échangé sous 7 jours. Procédure simple et rapide.", paragraphAr: "استبدال خلال 7 أيام", paragraphEn: "Exchange within 7 days" },
   ];
   const items = dbItems.length > 0 ? dbItems : fallback;
   const hKey = lang === "ar" ? "headingAr" : lang === "en" ? "headingEn" : "headingFr" as keyof WhyItem;
@@ -263,13 +231,13 @@ function WhyUs({ items: dbItems, lang, t }: { items: WhyItem[]; lang: string; t:
   return (
     <section className="wrap" data-reveal>
       <div className="section-head"><div><h2 className="text-heading">{t("why_title")}</h2></div></div>
-      <div className="why-grid">
+      <div className="why-scroll">
         {items.map((item, i) => (
-          <div key={i} className="why-item">
+          <div key={i} className="why-card">
             {item.imageUrl ? (
               <div className="why-img-wrap"><img src={item.imageUrl} alt="" className="why-img" /></div>
             ) : (
-              <WhyIcon name={item.icon} />
+              <WhyIcon name={item.icon} size={28} />
             )}
             <h4>{item[hKey]}</h4>
             <p>{item[pKey]}</p>
@@ -296,7 +264,10 @@ function FAQSection({ faqs: dbFaqs, lang, t }: { faqs: FaqEntry[]; lang: string;
           <div key={i} className={`faq-item ${i === openIdx ? "open" : ""}`}>
             <div className="faq-q" onClick={() => setOpenIdx(i === openIdx ? -1 : i)}>
               <span>{f[qKey]}</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14" /></svg>
+              <div className="faq-q-icon">
+                <svg className="plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: 18, height: 18 }}><path d="M12 5v14M5 12h14" /></svg>
+                <svg className="minus" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: 18, height: 18 }}><path d="M5 12h14" /></svg>
+              </div>
             </div>
             <div className="faq-a"><p>{f[aKey]}</p></div>
           </div>
@@ -316,7 +287,6 @@ export default function HomePage() {
   const [productsError, setProductsError] = useState(false);
   const [faqs, setFaqs] = useState<FaqEntry[]>([]);
   const [whyus, setWhyus] = useState<WhyItem[]>([]);
-  const [brands, setBrands] = useState<{ name: string; hot: boolean; logoUrl?: string }[]>([]);
   const [categories, setCategories] = useState<CatItem[]>([]);
   const [newArrivalSlides, setNewArrivalSlides] = useState<SlideItem[]>([]);
   const [promotionSlides, setPromotionSlides] = useState<SlideItem[]>([]);
@@ -337,15 +307,13 @@ export default function HomePage() {
     Promise.all([
       api("/api/content?type=faq"),
       api("/api/content?type=whyus"),
-      api("/api/content?type=brands"),
       api("/api/content?type=categories"),
       api("/api/slides?section=new_arrival"),
       api("/api/slides?section=promotion"),
       api("/api/landing"),
-    ]).then(([faqD, whyD, brandD, catD, newD, promD, landD]) => {
+    ]).then(([faqD, whyD, catD, newD, promD, landD]) => {
       if (faqD.faqs?.length) setFaqs(faqD.faqs);
       if (whyD.items?.length) setWhyus(whyD.items);
-      if (brandD.brands?.length) setBrands(brandD.brands);
       if (catD.categories?.length) setCategories(catD.categories);
       if (newD.slides?.length) setNewArrivalSlides(newD.slides);
       if (promD.slides?.length) setPromotionSlides(promD.slides);
@@ -380,7 +348,7 @@ export default function HomePage() {
       </div>
 
       <HeroSection settings={landingSettings} />
-      <Marquee brands={brands} />
+      <Marquee />
       <Categories categories={categories} lang={lang} t={t} />
 
       {newArrivalSlides.length > 0 ? (
@@ -424,30 +392,11 @@ export default function HomePage() {
       <WhyUs items={whyus} lang={lang} t={t} />
       <FAQSection faqs={faqs} lang={lang} t={t} />
 
-      <section className="wrap trust-section">
-        <div className="trust-inner">
-          <div className="trust-phone">
-            <a href="tel:0562829805">0562 82 98 05</a>
-          </div>
-          <div className="trust-policy">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" style={{ width: 18, height: 18, color: "var(--cop-dim)", flexShrink: 0 }}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
-            <span>{t("hero_policy")}</span>
-          </div>
-        </div>
-        <div className="social-bar">
-          <a href="https://www.tiktok.com/@copit_dz" target="_blank" rel="noopener noreferrer" className="social-btn" aria-label="TikTok">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z" /></svg>
-          </a>
-          <a href="https://www.instagram.com/copit_dz" target="_blank" rel="noopener noreferrer" className="social-btn" aria-label="Instagram">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" /></svg>
-          </a>
-          <a href="https://www.facebook.com/copit.2024/" target="_blank" rel="noopener noreferrer" className="social-btn" aria-label="Facebook">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>
-          </a>
-          <a href="https://wa.me/213562829805" target="_blank" rel="noopener noreferrer" className="social-btn" aria-label="WhatsApp">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-8.5 15.2L2 22l4.9-1.5A10 10 0 1012 2zm5.5 14.2c-.2.6-1.3 1.2-1.8 1.3-.5.1-1 .1-3.3-.7-2.8-1.1-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9 0-1.4.7-2 1-2.3.3-.3.6-.3.8-.3h.6c.2 0 .4 0 .6.5.2.5.7 1.8.8 1.9.1.1.1.3 0 .5-.1.2-.1.3-.3.5l-.4.5c-.1.1-.3.3-.1.6.2.3.9 1.4 1.9 2.3 1.3 1.1 2.3 1.5 2.7 1.7.3.1.5.1.7-.1.2-.2.7-.8.9-1.1.2-.3.4-.2.6-.1.2.1 1.5.7 1.8.8.3.1.4.2.5.3.1.2.1.9-.2 1.5z" /></svg>
-          </a>
-        </div>
+      <section className="wrap" style={{ padding: "30px 0", textAlign: "center" }}>
+        <p style={{ fontSize: 13, color: "var(--text-dim)", lineHeight: 1.6, maxWidth: 500, margin: "0 auto" }}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" style={{ width: 16, height: 16, display: "inline-block", verticalAlign: "middle", marginRight: 6, color: "var(--cop-dim)" }}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+          {t("hero_policy")}
+        </p>
       </section>
 
       <Footer />
