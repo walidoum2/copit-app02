@@ -49,7 +49,7 @@ export default function AdminLanding() {
     setTimeout(() => setToastMsg(""), 2600);
   }
 
-  async function handleHeroImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleImageUpload(key: string, e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     e.target.value = "";
@@ -60,7 +60,7 @@ export default function AdminLanding() {
       const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
       if (!res.ok) { showToast("Upload failed"); return; }
       const data = await res.json();
-      if (data.url) { update("hero_visual_img", data.url); showToast("Image uploaded!"); }
+      if (data.url) { update(key, data.url); showToast("Image uploaded!"); }
     } catch { showToast("Upload failed"); }
     finally { setUploading(false); }
   }
@@ -113,6 +113,8 @@ export default function AdminLanding() {
     { key: "new_arrival_subtitle", label: "Nouveautés - Sous-titre" },
     { key: "promo_title", label: "Promotions - Titre" },
     { key: "promo_subtitle", label: "Promotions - Sous-titre" },
+    { key: "banner_chaussures_img", label: "Bannière Chaussures - Image (upload ou URL)" },
+    { key: "banner_promo_img", label: "Bannière Promotions - Image (upload ou URL)" },
   ];
 
   if (loading) return <p style={{ color: "var(--steel)", margin: 20 }}>Loading...</p>;
@@ -128,10 +130,10 @@ export default function AdminLanding() {
             <label>{label}</label>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               <input value={settings[key] || ""} onChange={e => update(key, e.target.value)} style={{ flex: 1 }} />
-              {key === "hero_visual_img" && (
+              {key.endsWith("_img") && (
                 <label style={{ whiteSpace: "nowrap", cursor: "pointer", padding: "8px 14px", background: "var(--bg2)", border: "1px solid var(--line)", borderRadius: 2, fontSize: 12 }}>
                   {uploading ? "..." : "+ Upload"}
-                  <input type="file" accept="image/*" style={{ display: "none" }} onChange={handleHeroImageUpload} />
+                  <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => handleImageUpload(key, e)} />
                 </label>
               )}
             </div>
