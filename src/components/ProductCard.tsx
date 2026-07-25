@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, useState } from "react";
+import { useLang } from "@/contexts/LangContext";
 import { optimizeCldUrl } from "@/lib/cloudinary";
 
 export interface ProductData {
@@ -46,29 +47,15 @@ function ProductIcon({ category }: { category: string }) {
   );
 }
 
-const PALETTE: Record<string, [string, string]> = {
-  "CP-DM-1460": ["#e8ddd6", "#d4c9bf"],
-  "CP-UA-HP3": ["#d6d9de", "#c4c7cc"],
-  "CP-PM-LFR": ["#e0e0e6", "#ceced4"],
-  "CP-OS-D3": ["#d8dfd8", "#c6cdc6"],
-  "CP-JD-ARC": ["#e3d0d0", "#d4bebe"],
-  "CP-BS-HD1": ["#dcdcde", "#cacacc"],
-  "CP-BS-CG1": ["#dadcd6", "#c8cac4"],
-  "CP-BS-BK1": ["#ddd5ce", "#ccc4bc"],
-};
-
 export default memo(function ProductCard({ product, onClick }: { product: ProductData; onClick: () => void }) {
-  const totalStock = product.variants.reduce((a, v) => a + v.stock, 0);
-  const pct = Math.min(100, Math.round((totalStock / 24) * 100));
-  const [sw1, sw2] = PALETTE[product.sku] || ["#f0f0ec", "#e4e4df"];
+  const { t } = useLang();
   const [imgErr, setImgErr] = useState(false);
-
   const img = product.images?.[0]?.url;
 
   return (
-    <div className="pcard" onClick={onClick} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter") onClick(); }}>
-      <div className="pcard-img" style={img ? {} : { "--sw1": sw1, "--sw2": sw2 } as React.CSSProperties}>
-        {product.tag && <span className={`badge pcard-tag${!img ? "" : ""}`}>{product.tag}</span>}
+    <div className="pcard">
+      <div className="pcard-img" onClick={onClick} style={{ cursor: "pointer" }}>
+        {product.tag && <span className="badge pcard-tag">{product.tag}</span>}
         {img && !imgErr ? (
           <img src={optimizeCldUrl(img, { w: 400 })} alt={product.name} loading="lazy" onError={() => setImgErr(true)} />
         ) : (
@@ -84,12 +71,9 @@ export default memo(function ProductCard({ product, onClick }: { product: Produc
             <span className="was">{money(product.originalPrice)}</span>
           )}
         </div>
-        {totalStock < 8 && totalStock > 0 && (
-          <div style={{ marginTop: 10 }}>
-            <div className="copmeter"><i style={{ width: `${pct}%` }} /></div>
-            <div className="copmeter-label">{totalStock} unites restantes</div>
-          </div>
-        )}
+        <div className="pcard-atc">
+          <button onClick={onClick}>{t("add_to_cart")}</button>
+        </div>
       </div>
     </div>
   );

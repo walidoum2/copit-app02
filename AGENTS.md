@@ -26,12 +26,17 @@
 
 - **Backup at** `C:\Users\TADJER\Documents\New OpenCode Project\copit-app-backup` — restore code by copying `src/`, `prisma/`, config files back
 
-## Design (light mode — switched from dark in Priority 7 redesign)
-- **Light mode**: white background (`--bg: #FCFCFA`), near-black text (`--text: #1A1A1A`), card backgrounds `--bg2: #F0F0EC`
-- **Monochrome palette**: `--cop` (#C8C8C8), `--cop-dim` (#969696), `--cobalt` (#555555), `--alert` (#777777), `--accent` (#1A1A1A)
-- **Glow effects**: `pulseGlow` on hero, `shimmer` on primary buttons, `float` animation, hover lift + box-shadow on cards
+## Design (dark premium monochrome streetwear)
+- **Dark mode**: deep black (`--bg: #0A0A0A`), white text (`--text: #F0F0F0`), charcoal cards `--bg2: #141414`, dark gray `--bg3: #1E1E1E`
+- **All rounded**: `--radius: 12px` on cards, buttons, inputs, drawers
+- **Easing**: `cubic-bezier(0.16, 1, 0.3, 1)` for all transitions/animations
+- **Floating cart**: fixed bottom-right white circle with badge count (class `.fcart`)
+- **Hero**: "LIKE IT. WANT IT. COP IT." stacked bold typography with radial glow, two pill CTAs (`.hero-premium`)
+- **Category grid**: 2 square + 1 wide, dynamic admin images with gradient overlay (`.cat-grid-premium`)
+- **Product grid**: fixed 2 columns, dark cards, rounded images, brand + name + price + white Add to Cart button (`.grid-products-premium`)
+- **Why Us**: 4 icon cards with hover lift (`.why-grid-premium`)
+- **FAQ**: dark accordion with plus/minus toggle, smooth open (`.faq-list-premium`)
 - **Backward compat vars**: `--bone: var(--text)`, `--ink: var(--bg)`, `--ink2: var(--bg2)` for legacy inline SVGs
-- **Product palettes**: light gradients (e.g. `#e8ddd6`/`#d4c9bf`) instead of dark
 - **2 languages**: French default (LTR), Arabic (RTL). `Lang` type = `"fr" | "ar"`. English removed from UI but `DICT.en`/`FAQ_DATA.en` kept for internal fallback.
 
 ## DB content (editable from admin)
