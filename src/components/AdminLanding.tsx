@@ -99,8 +99,18 @@ export default function AdminLanding() {
     }
   }
 
-  const fields: { key: string; label: string; type?: string }[] = [
-    { key: "promo_text", label: "Texte bandeau promo" },
+  const promoVisible = settings.promo_visible !== "0";
+
+  const allFields: { key: string; label: string; type?: string }[] = [
+    { key: "promo_text", label: "Bandeau promo - Texte" },
+    { key: "promo_visible", label: "Bandeau promo - Visible" },
+    { key: "promo_text_color", label: "Bandeau promo - Couleur texte", type: "color" },
+    { key: "promo_bg_color", label: "Bandeau promo - Couleur fond", type: "color" },
+    { key: "promo_font_size", label: "Bandeau promo - Taille police (px)" },
+    { key: "promo_font_weight", label: "Bandeau promo - Poids (400/600/700/800)" },
+    { key: "promo_border_radius", label: "Bandeau promo - Border radius (px)" },
+    { key: "promo_padding_y", label: "Bandeau promo - Padding vertical (px)" },
+    { key: "promo_padding_x", label: "Bandeau promo - Padding horizontal (px)" },
     { key: "hero_eyebrow", label: "Hero - Sur-titre" },
     { key: "hero_title", label: "Hero - Titre principal" },
     { key: "hero_subtitle", label: "Hero - Sous-titre" },
@@ -125,16 +135,30 @@ export default function AdminLanding() {
         Personnalise le texte de chaque section de la page d'accueil.
       </p>
       <div style={{ maxWidth: 600 }}>
-        {fields.map(({ key, label }) => (
+        {allFields.map(({ key, label, type }) => (
           <div key={key} className="field">
             <label>{label}</label>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              <input value={settings[key] || ""} onChange={e => update(key, e.target.value)} style={{ flex: 1 }} />
-              {key.endsWith("_img") && (
-                <label style={{ whiteSpace: "nowrap", cursor: "pointer", padding: "8px 14px", background: "var(--bg2)", border: "1px solid var(--line)", borderRadius: 2, fontSize: 12 }}>
-                  {uploading ? "..." : "+ Upload"}
-                  <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => handleImageUpload(key, e)} />
+              {key === "promo_visible" ? (
+                <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13 }}>
+                  <input type="checkbox" checked={promoVisible} onChange={e => update("promo_visible", e.target.checked ? "1" : "0")} style={{ width: 18, height: 18, accentColor: "var(--text)" }} />
+                  {promoVisible ? "Visible sur le site" : "Masqué"}
                 </label>
+              ) : type === "color" ? (
+                <div style={{ display: "flex", gap: 8, alignItems: "center", flex: 1 }}>
+                  <input type="color" value={settings[key] || "#ffffff"} onChange={e => update(key, e.target.value)} style={{ width: 40, height: 36, padding: 0, border: "1px solid var(--line)", borderRadius: 4, cursor: "pointer", background: "none" }} />
+                  <input value={settings[key] || ""} onChange={e => update(key, e.target.value)} style={{ flex: 1 }} placeholder="#ffffff" />
+                </div>
+              ) : (
+                <div style={{ display: "flex", gap: 8, alignItems: "center", flex: 1 }}>
+                  <input value={settings[key] || ""} onChange={e => update(key, e.target.value)} style={{ flex: 1 }} />
+                  {key.endsWith("_img") && (
+                    <label style={{ whiteSpace: "nowrap", cursor: "pointer", padding: "8px 14px", background: "var(--bg2)", border: "1px solid var(--line)", borderRadius: 2, fontSize: 12 }}>
+                      {uploading ? "..." : "+ Upload"}
+                      <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => handleImageUpload(key, e)} />
+                    </label>
+                  )}
+                </div>
               )}
             </div>
           </div>

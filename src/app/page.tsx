@@ -30,74 +30,56 @@ function useScrollReveal() {
   }, []);
 }
 
-interface CatItem { nameFr: string; nameAr: string; nameEn: string; slug: string; imageUrl?: string; }
+function Marquee() {
+  const { lang } = useLang();
+  const items = lang === "ar"
+    ? ["نايك", "أديداس", "أسيكس", "نيو بالانس", "جوردن", "كوب إت", "بوما", "كونفيرس"]
+    : ["NIKE", "ADIDAS", "ASICS", "NEW BALANCE", "JORDAN", "COPIT", "PUMA", "CONVERSE"];
+  return (
+    <div className="marquee" role="presentation" aria-hidden="true">
+      <div className="marquee-track">
+        {[0, 1].map((i) => (
+          <div key={i} className="marquee-content">
+            {items.map((item, j) => (
+              <span key={j}>{item}</span>
+            ))}
+            {i === 0 && <span className="marquee-dot">✦</span>}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
-function Categories({ categories: dbCats, lang, t }: { categories: CatItem[]; lang: string; t: (k: string) => string }) {
-  const nameKey = lang === "ar" ? "nameAr" : lang === "en" ? "nameEn" : "nameFr" as keyof CatItem;
-  const cats = dbCats.length > 0 ? dbCats : [
-    { nameFr: "Sneakers", nameAr: "سنيكرز", nameEn: "Sneakers", slug: "Chaussures" },
-    { nameFr: "Vêtements", nameAr: "ملابس", nameEn: "Clothing", slug: "Vêtements" },
-    { nameFr: "Accessoires", nameAr: "إكسسوارات", nameEn: "Accessories", slug: "Accessoires" },
-  ] as CatItem[];
-  const topTwo = cats.slice(0, 2);
-  const bottom = cats.slice(2);
+function CategoryCard({ categories, lang, t }: { categories: any[]; lang: string; t: (k: string) => string }) {
+  const cat = categories.find((c: any) => c.slug === "Chaussures");
+  if (!cat) return null;
+  const nameKey = lang === "ar" ? "nameAr" : lang === "en" ? "nameEn" : "nameFr" as string;
   return (
     <section className="wrap" data-reveal>
       <div className="section-head-alt">
         <h2>{t("cat_title")}</h2>
       </div>
-      <div className="cat-grid-premium">
-        <div className="cat-row-top">
-          {topTwo.map((cat) => (
-            <a key={cat.slug} href={`/shop?category=${encodeURIComponent(cat.slug)}`} className="cat-card-premium">
-              {cat.imageUrl ? (
-                <div className="cat-premium-img-wrap">
-                  <img src={optimizeCldUrl(cat.imageUrl, { w: 600 })} alt="" className="cat-premium-img" loading="lazy" />
-                  <div className="cat-premium-overlay" />
-                </div>
-              ) : (
-                <div className="cat-premium-placeholder">
-                  <svg viewBox="0 0 80 80" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 40, height: 40, opacity: 0.3 }}>
-                    <rect x="8" y="16" width="64" height="48" rx="4" />
-                    <circle cx="30" cy="36" r="8" />
-                    <path d="M8 54l18-14 14 12 12-10 20 16" />
-                  </svg>
-                </div>
-              )}
-              <div className="cat-premium-content">
-                <h3>{cat[nameKey]}</h3>
-                <span className="cat-premium-cta">LE SHOP →</span>
-              </div>
-            </a>
-          ))}
-        </div>
-        {bottom.length > 0 && (
-          <div className="cat-row-bottom">
-            {bottom.map((cat) => (
-              <a key={cat.slug} href={`/shop?category=${encodeURIComponent(cat.slug)}`} className="cat-card-premium wide">
-                {cat.imageUrl ? (
-                  <div className="cat-premium-img-wrap">
-                    <img src={optimizeCldUrl(cat.imageUrl, { w: 800 })} alt="" className="cat-premium-img" loading="lazy" />
-                    <div className="cat-premium-overlay" />
-                  </div>
-                ) : (
-                  <div className="cat-premium-placeholder">
-                    <svg viewBox="0 0 80 80" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 40, height: 40, opacity: 0.3 }}>
-                      <rect x="8" y="16" width="64" height="48" rx="4" />
-                      <circle cx="30" cy="36" r="8" />
-                      <path d="M8 54l18-14 14 12 12-10 20 16" />
-                    </svg>
-                  </div>
-                )}
-                <div className="cat-premium-content">
-                  <h3>{cat[nameKey]}</h3>
-                  <span className="cat-premium-cta">LE SHOP →</span>
-                </div>
-              </a>
-            ))}
+      <a href="#sneakers-section" className="cat-card-horizontal">
+        {cat.imageUrl ? (
+          <div className="cat-img-wrap">
+            <img src={optimizeCldUrl(cat.imageUrl, { w: 1000 })} alt="" className="cat-img" loading="lazy" />
+            <div className="cat-overlay" />
+          </div>
+        ) : (
+          <div className="cat-placeholder">
+            <svg viewBox="0 0 80 80" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 44, height: 44, opacity: 0.2 }}>
+              <rect x="8" y="16" width="64" height="48" rx="4" />
+              <circle cx="30" cy="36" r="8" />
+              <path d="M8 54l18-14 14 12 12-10 20 16" />
+            </svg>
           </div>
         )}
-      </div>
+        <div className="cat-content">
+          <h3>{cat[nameKey]}</h3>
+          <span className="cat-cta">{lang === "ar" ? "شاهد السنيكرز ←" : "VOIR LES SNEAKERS →"}</span>
+        </div>
+      </a>
     </section>
   );
 }
@@ -182,35 +164,33 @@ export default function HomePage() {
   const [selectedProduct, setSelectedProduct] = useState<ProductData | null>(null);
   const [toastMsg, setToastMsg] = useState("");
   const [productsError, setProductsError] = useState(false);
+  const [dataLoaded, setDataLoaded] = useState(false);
   const [faqs, setFaqs] = useState<FaqEntry[]>([]);
   const [whyus, setWhyus] = useState<WhyItem[]>([]);
-  const [categories, setCategories] = useState<CatItem[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
   const [landingSettings, setLandingSettings] = useState<Record<string, string>>({});
   const { t, lang } = useLang();
   const { count } = useCart();
 
   const L = (key: string, fallback: string) => landingSettings[key] || fallback;
 
-  function api(url: string) { return fetch(url + (url.includes("?") ? "&" : "?") + "_t=" + Date.now()).then(r => r.json()); }
-
   useEffect(() => {
-    api("/api/products?limit=4")
-      .then((d) => {
-        if (d.products) setProducts(d.products);
-        else setProductsError(true);
-      })
-      .catch(() => setProductsError(true));
+    const ts = Date.now();
     Promise.all([
-      api("/api/content?type=faq"),
-      api("/api/content?type=whyus"),
-      api("/api/content?type=categories"),
-      api("/api/landing"),
-    ]).then(([faqD, whyD, catD, landD]) => {
+      fetch(`/api/products?limit=4&category=Chaussures&_t=${ts}`).then(r => r.json()),
+      fetch(`/api/content?type=faq&_t=${ts}`).then(r => r.json()),
+      fetch(`/api/content?type=whyus&_t=${ts}`).then(r => r.json()),
+      fetch(`/api/content?type=categories&_t=${ts}`).then(r => r.json()),
+      fetch(`/api/landing?_t=${ts}`).then(r => r.json()),
+    ]).then(([prodD, faqD, whyD, catD, landD]) => {
+      if (prodD.products) setProducts(prodD.products);
+      else setProductsError(true);
       if (faqD.faqs?.length) setFaqs(faqD.faqs);
       if (whyD.items?.length) setWhyus(whyD.items);
       if (catD.categories?.length) setCategories(catD.categories);
       if (landD.settings) setLandingSettings(landD.settings);
-    }).catch(() => {});
+    }).catch(() => setProductsError(true))
+    .finally(() => setDataLoaded(true));
   }, []);
 
   useScrollReveal();
@@ -220,7 +200,15 @@ export default function HomePage() {
     setTimeout(() => setToastMsg(""), 2600);
   }
 
-  const sortedProducts = [...products].sort((a, b) => (a.position || 0) - (b.position || 0)).slice(0, 4);
+  const promoVisible = L("promo_visible", "1") !== "0";
+  const promoInline: Record<string, string> = {};
+  const pc = L("promo_text_color", ""); if (pc) promoInline.color = pc;
+  const bg = L("promo_bg_color", ""); if (bg) promoInline.background = bg;
+  const fs = L("promo_font_size", ""); if (fs) promoInline.fontSize = fs + "px";
+  const fw = L("promo_font_weight", ""); if (fw) promoInline.fontWeight = fw;
+  const br = L("promo_border_radius", ""); if (br) promoInline.borderRadius = br + "px";
+  const py = L("promo_padding_y", ""); if (py) { promoInline.paddingTop = py + "px"; promoInline.paddingBottom = py + "px"; }
+  const px = L("promo_padding_x", ""); if (px) { promoInline.paddingLeft = px + "px"; promoInline.paddingRight = px + "px"; }
 
   return (
     <>
@@ -233,9 +221,11 @@ export default function HomePage() {
         onToast={showToast}
       />
 
-      <div className="promo-bar">
-        <span>🔥 {lang === "ar" ? "توصيل مجاني للطلبيات فوق 15000 دج" : "LIVRAISON OFFERTE DÈS 15 000 DA"} 🔥</span>
-      </div>
+      {promoVisible && (
+        <div className="promo-bar" style={promoInline as React.CSSProperties}>
+          <span>{L("promo_text", lang === "ar" ? "توصيل مجاني للطلبيات فوق 15000 دج" : "LIVRAISON OFFERTE DÈS 15 000 DA")}</span>
+        </div>
+      )}
 
       <section className="hero-premium">
         <div className="wrap">
@@ -252,19 +242,28 @@ export default function HomePage() {
         </div>
       </section>
 
-      <Categories categories={categories} lang={lang} t={t} />
+      <Marquee />
 
-      <section className="product-section-premium" data-reveal>
+      <CategoryCard categories={categories} lang={lang} t={t} />
+
+      <section className="product-section-premium" id="sneakers-section" data-reveal>
         <div className="wrap">
           <div className="section-head-alt">
             <h2>{t("new_title")}</h2>
-            <a href="/shop" className="btn-premium-outline">{t("see_all")}</a>
           </div>
           <div className="grid-products-premium">
-            {productsError ? (
+            {!dataLoaded ? (
+              <p style={{ color: "var(--text-dim)", fontSize: 13, gridColumn: "1 / -1", textAlign: "center", padding: 40 }}>
+                <span className="spinner" />
+              </p>
+            ) : productsError ? (
               <p style={{ color: "var(--text-dim)", fontSize: 13, gridColumn: "1 / -1", textAlign: "center", padding: 40 }}>{t("home_products_error")}</p>
+            ) : products.length === 0 ? (
+              <p style={{ color: "var(--text-dim)", fontSize: 13, gridColumn: "1 / -1", textAlign: "center", padding: 40 }}>
+                {lang === "ar" ? "لا توجد منتجات متاحة حالياً" : "Aucun produit disponible pour le moment"}
+              </p>
             ) : (
-              sortedProducts.map((p) => (
+              [...products].sort((a, b) => (a.position || 0) - (b.position || 0)).map((p) => (
                 <ProductCard key={p.id} product={p} onClick={() => setSelectedProduct(p)} />
               ))
             )}

@@ -200,7 +200,109 @@ section { padding: 60px 0; }
   margin-top: 32px;
 }
 
-/* ===== Category Grid Premium ===== */
+/* ===== Marquee ===== */
+.marquee {
+  overflow: hidden;
+  width: 100%;
+  padding: 16px 0;
+  background: var(--bg2);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  margin-bottom: -1px;
+}
+.marquee-track {
+  display: flex;
+  width: fit-content;
+  animation: marqueeScroll 40s linear infinite;
+}
+.marquee-content {
+  display: flex;
+  gap: 48px;
+  padding: 0 24px;
+  flex-shrink: 0;
+  align-items: center;
+}
+.marquee-content span {
+  font-family: 'Anton', sans-serif;
+  font-size: 14px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--text);
+  white-space: nowrap;
+  opacity: 0.6;
+  transition: opacity 0.2s var(--ease);
+}
+.marquee-content span:hover { opacity: 1; }
+.marquee-dot { color: var(--text-dim); font-size: 10px; opacity: 0.4; }
+@keyframes marqueeScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ===== Category Card Horizontal (single Chaussures card) ===== */
+.cat-card-horizontal {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 3/1;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--bg3);
+  text-decoration: none;
+  transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease);
+  min-height: 160px;
+}
+.cat-card-horizontal:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+.cat-card-horizontal .cat-img-wrap { position: absolute; inset: 0; }
+.cat-card-horizontal .cat-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s var(--ease); }
+.cat-card-horizontal:hover .cat-img { transform: scale(1.06); }
+.cat-card-horizontal .cat-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.1) 100%);
+}
+.cat-card-horizontal .cat-placeholder {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-dim);
+}
+.cat-card-horizontal .cat-content {
+  position: relative;
+  z-index: 2;
+  text-align: left;
+  padding: 32px;
+  width: 100%;
+}
+.cat-card-horizontal .cat-content h3 {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(32px, 5vw, 52px);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #fff;
+  text-shadow: 0 2px 16px rgba(0,0,0,0.4);
+  line-height: 1;
+}
+.cat-card-horizontal .cat-cta {
+  display: inline-block;
+  margin-top: 14px;
+  padding: 10px 22px;
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(4px);
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #fff;
+  transition: all 0.3s var(--ease);
+}
+.cat-card-horizontal:hover .cat-cta { background: rgba(255,255,255,0.25); letter-spacing: 3px; }
+[dir="rtl"] .cat-card-horizontal .cat-content { text-align: right; }
+[dir="rtl"] .cat-card-horizontal .cat-overlay {
+  background: linear-gradient(-90deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.1) 100%);
+}
+
+/* Legacy category grid — kept for backward compat */
 .cat-grid-premium { display: flex; flex-direction: column; gap: 12px; }
 .cat-row-top { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .cat-row-bottom { display: grid; grid-template-columns: 1fr; gap: 12px; }
@@ -641,13 +743,25 @@ button:focus:not(:focus-visible) { outline: none; }
   .pcard-body { padding: 12px 12px 14px; }
   .pcard-name { font-size: 13px; }
   .section-head-alt { flex-direction: column; align-items: flex-start; }
+  .cat-card-horizontal { aspect-ratio: 2.4/1; min-height: 130px; }
+  .cat-card-horizontal .cat-content { padding: 20px; }
+  .cat-card-horizontal .cat-content h3 { font-size: clamp(24px, 5vw, 32px); }
+  .marquee-content { gap: 32px; }
+  .marquee-content span { font-size: 12px; letter-spacing: 3px; }
 }
 
 @media (max-width: 480px) {
   .grid-products-premium { gap: 10px; }
+  .cat-card-horizontal { aspect-ratio: 2/1; min-height: 110px; }
+  .cat-card-horizontal .cat-content { padding: 16px; }
+  .cat-card-horizontal .cat-content h3 { font-size: clamp(20px, 6vw, 26px); }
+  .cat-card-horizontal .cat-cta { padding: 8px 16px; font-size: 10px; }
   .cat-row-top { gap: 10px; }
   .cat-row-bottom { gap: 10px; }
   .why-grid-premium { grid-template-columns: 1fr 1fr; }
+  .marquee { padding: 12px 0; }
+  .marquee-content { gap: 24px; padding: 0 16px; }
+  .marquee-content span { font-size: 11px; letter-spacing: 2px; }
   .pcard-body { padding: 10px 10px 12px; }
   .pcard-name { font-size: 12px; }
   .pcard-price .now { font-size: 14px; }
