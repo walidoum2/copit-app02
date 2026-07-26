@@ -46,6 +46,22 @@ export default function Header({ onCartOpen }: { onCartOpen: () => void }) {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setMenuOpen(false);
+    }
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
+
   const navLinks = [
     { href: "/shop?category=Chaussures", label: t("nav_sneakers"), key: "sneakers" },
     { href: "/shop?category=Vêtements", label: t("nav_clothes"), key: "clothes" },

@@ -51,20 +51,28 @@ function Marquee() {
   );
 }
 
-function CategoryCard({ categories, products, lang, t }: { categories: any[]; products: ProductData[]; lang: string; t: (k: string) => string }) {
+function CategoryCard({ categories, dataLoaded, lang, t }: { categories: any[]; dataLoaded: boolean; lang: string; t: (k: string) => string }) {
   const cat = categories.find((c: any) => c.slug === "Chaussures");
-  if (!cat) return null;
   const nameKey = lang === "ar" ? "nameAr" : lang === "en" ? "nameEn" : "nameFr" as string;
-  const fallbackImg = cat.imageUrl || (products.find(p => p.images?.length)?.images[0]?.url) || "";
+  const fallbackImg = cat?.imageUrl || "";
   const [imgSrc, setImgSrc] = useState(fallbackImg);
   const [imgFailed, setImgFailed] = useState(!fallbackImg);
   useEffect(() => { setImgSrc(fallbackImg); setImgFailed(!fallbackImg); }, [fallbackImg]);
+  if (!dataLoaded) return (
+    <section className="wrap" data-reveal>
+      <div className="section-head-alt"><h2>{t("cat_title")}</h2></div>
+      <div className="cat-card-horizontal cat-card-loading">
+        <div className="cat-content"><h3>—</h3></div>
+      </div>
+    </section>
+  );
+  if (!cat) return null;
   return (
     <section className="wrap" data-reveal>
       <div className="section-head-alt">
         <h2>{t("cat_title")}</h2>
       </div>
-      <a href="#sneakers-section" className="cat-card-horizontal">
+      <a href="/shop?category=Chaussures" className="cat-card-horizontal">
         {imgSrc && !imgFailed ? (
           <div className="cat-img-wrap">
             <img src={optimizeCldUrl(imgSrc, { w: 1000 })} alt="" className="cat-img" loading="lazy" onError={() => setImgFailed(true)} />
@@ -72,7 +80,7 @@ function CategoryCard({ categories, products, lang, t }: { categories: any[]; pr
           </div>
         ) : (
           <div className="cat-fallback">
-            <svg viewBox="0 0 200 130" fill="none" stroke="currentColor" strokeWidth="1" style={{ width: "35%", maxWidth: 60, opacity: 0.15 }}>
+            <svg viewBox="0 0 200 130" fill="none" stroke="currentColor" strokeWidth="1" style={{ width: "35%", maxWidth: 60, opacity: 0.4 }}>
               <path d="M10 95c0-8 8-14 18-16 12-2 20-10 30-14 14-6 30-6 42 2 6 4 10 4 18 2 14-4 30 0 42 10 8 6 12 8 20 8 6 0 8 4 8 8v8c0 4-3 7-7 7H17c-4 0-7-3-7-7v-8z" />
               <path d="M40 95v-10M60 95v-14M85 95v-16" strokeDasharray="2 3" />
             </svg>
@@ -80,7 +88,7 @@ function CategoryCard({ categories, products, lang, t }: { categories: any[]; pr
         )}
         <div className="cat-content">
           <h3>{cat[nameKey]}</h3>
-          <span className="cat-cta">{lang === "ar" ? "شاهد السنيكرز ←" : "VOIR LES SNEAKERS →"}</span>
+          <span className="cat-cta">{lang === "ar" ? "تسوق الآن ←" : "LE SHOP →"}</span>
         </div>
       </a>
     </section>
@@ -180,7 +188,7 @@ export default function HomePage() {
   useEffect(() => {
     const ts = Date.now();
     Promise.all([
-      fetch(`/api/products?limit=4&category=Chaussures&_t=${ts}`).then(r => r.json()),
+      fetch(`/api/products?category=Chaussures&_t=${ts}`).then(r => r.json()),
       fetch(`/api/content?type=faq&_t=${ts}`).then(r => r.json()),
       fetch(`/api/content?type=whyus&_t=${ts}`).then(r => r.json()),
       fetch(`/api/content?type=categories&_t=${ts}`).then(r => r.json()),
@@ -247,7 +255,7 @@ export default function HomePage() {
 
       <Marquee />
 
-      <CategoryCard categories={categories} products={products} lang={lang} t={t} />
+      <CategoryCard categories={categories} dataLoaded={dataLoaded} lang={lang} t={t} />
 
       <section className="product-section-premium" id="sneakers-section" data-reveal>
         <div className="wrap">
@@ -271,6 +279,13 @@ export default function HomePage() {
               ))
             )}
           </div>
+          {dataLoaded && !productsError && products.length > 0 && (
+            <div style={{ textAlign: "center", marginTop: 36 }}>
+              <a href="/shop?category=Chaussures" className="btn-premium-outline">
+                {lang === "ar" ? "عرض الكل ←" : "TOUT VOIR →"}
+              </a>
+            </div>
+          )}
         </div>
       </section>
 

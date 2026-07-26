@@ -254,6 +254,8 @@ section { padding: 60px 0; }
   min-height: 160px;
 }
 .cat-card-horizontal:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+.cat-card-loading { background: var(--bg2); animation: shimmer 1.8s ease-in-out infinite; background-image: linear-gradient(90deg, var(--bg2) 0%, var(--bg3) 50%, var(--bg2) 100%); background-size: 200% 100%; }
+.cat-card-loading .cat-content h3 { color: var(--text-dim); }
 .cat-card-horizontal .cat-img-wrap { position: absolute; inset: 0; }
 .cat-card-horizontal .cat-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s var(--ease); }
 .cat-card-horizontal:hover .cat-img { transform: scale(1.06); }
