@@ -261,6 +261,18 @@ section { padding: 60px 0; }
   position: absolute; inset: 0;
   background: linear-gradient(90deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.1) 100%);
 }
+.cat-card-horizontal .cat-fallback {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  color: rgba(255,255,255,0.3);
+}
+.cat-card-horizontal .cat-fallback::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 60%);
+  pointer-events: none;
+}
 .cat-card-horizontal .cat-placeholder {
   position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;

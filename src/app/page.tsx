@@ -51,27 +51,30 @@ function Marquee() {
   );
 }
 
-function CategoryCard({ categories, lang, t }: { categories: any[]; lang: string; t: (k: string) => string }) {
+function CategoryCard({ categories, products, lang, t }: { categories: any[]; products: ProductData[]; lang: string; t: (k: string) => string }) {
   const cat = categories.find((c: any) => c.slug === "Chaussures");
   if (!cat) return null;
   const nameKey = lang === "ar" ? "nameAr" : lang === "en" ? "nameEn" : "nameFr" as string;
+  const fallbackImg = cat.imageUrl || (products.find(p => p.images?.length)?.images[0]?.url) || "";
+  const [imgSrc, setImgSrc] = useState(fallbackImg);
+  const [imgFailed, setImgFailed] = useState(!fallbackImg);
+  useEffect(() => { setImgSrc(fallbackImg); setImgFailed(!fallbackImg); }, [fallbackImg]);
   return (
     <section className="wrap" data-reveal>
       <div className="section-head-alt">
         <h2>{t("cat_title")}</h2>
       </div>
       <a href="#sneakers-section" className="cat-card-horizontal">
-        {cat.imageUrl ? (
+        {imgSrc && !imgFailed ? (
           <div className="cat-img-wrap">
-            <img src={optimizeCldUrl(cat.imageUrl, { w: 1000 })} alt="" className="cat-img" loading="lazy" />
+            <img src={optimizeCldUrl(imgSrc, { w: 1000 })} alt="" className="cat-img" loading="lazy" onError={() => setImgFailed(true)} />
             <div className="cat-overlay" />
           </div>
         ) : (
-          <div className="cat-placeholder">
-            <svg viewBox="0 0 80 80" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 44, height: 44, opacity: 0.2 }}>
-              <rect x="8" y="16" width="64" height="48" rx="4" />
-              <circle cx="30" cy="36" r="8" />
-              <path d="M8 54l18-14 14 12 12-10 20 16" />
+          <div className="cat-fallback">
+            <svg viewBox="0 0 200 130" fill="none" stroke="currentColor" strokeWidth="1" style={{ width: "35%", maxWidth: 60, opacity: 0.15 }}>
+              <path d="M10 95c0-8 8-14 18-16 12-2 20-10 30-14 14-6 30-6 42 2 6 4 10 4 18 2 14-4 30 0 42 10 8 6 12 8 20 8 6 0 8 4 8 8v8c0 4-3 7-7 7H17c-4 0-7-3-7-7v-8z" />
+              <path d="M40 95v-10M60 95v-14M85 95v-16" strokeDasharray="2 3" />
             </svg>
           </div>
         )}
@@ -244,7 +247,7 @@ export default function HomePage() {
 
       <Marquee />
 
-      <CategoryCard categories={categories} lang={lang} t={t} />
+      <CategoryCard categories={categories} products={products} lang={lang} t={t} />
 
       <section className="product-section-premium" id="sneakers-section" data-reveal>
         <div className="wrap">
