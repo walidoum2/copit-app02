@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthAdmin, prisma } from "@/lib/auth";
+import { revalidatePath } from "next/cache";
 
 export async function GET(req: NextRequest) {
   const admin = await getAuthAdmin(req);
@@ -21,7 +22,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     if (!body.section) return NextResponse.json({ error: "section required" }, { status: 400 });
     const slide = await prisma.homeSlide.create({ data: body });
-    return NextResponse.json({ slide });
+    revalidatePath("/", "layout"); return NextResponse.json({ slide });
   } catch {
     return NextResponse.json({ error: "Failed to create slide" }, { status: 500 });
   }
@@ -35,7 +36,7 @@ export async function PUT(req: NextRequest) {
     const { id, ...data } = body;
     if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
     const slide = await prisma.homeSlide.update({ where: { id }, data });
-    return NextResponse.json({ slide });
+    revalidatePath("/", "layout"); return NextResponse.json({ slide });
   } catch {
     return NextResponse.json({ error: "Failed to update slide" }, { status: 500 });
   }
@@ -48,7 +49,7 @@ export async function DELETE(req: NextRequest) {
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
   try {
     await prisma.homeSlide.delete({ where: { id } });
-    return NextResponse.json({ ok: true });
+    revalidatePath("/", "layout"); return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: "Failed to delete slide" }, { status: 500 });
   }

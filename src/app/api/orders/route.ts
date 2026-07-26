@@ -6,6 +6,8 @@ import { createProcolisShipment } from "@/lib/procolis";
 import { randomUUID } from "crypto";
 import { FREE_SHIP_THRESHOLD } from "@/data/dictionary";
 
+export const dynamic = "force-dynamic";
+
 const PHONE_REGEX = /^0[5-7]\d{8}$/;
 
 function getClientIp(request: Request): string {

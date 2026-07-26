@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthAdmin, prisma } from "@/lib/auth";
+import { revalidatePath } from "next/cache";
 
 export async function GET(req: NextRequest) {
   const admin = await getAuthAdmin(req);
@@ -26,6 +27,7 @@ export async function PUT(req: NextRequest) {
       update: { value: String(value) },
       create: { key, value: String(value) },
     });
+    revalidatePath("/", "layout");
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: "Failed to save setting" }, { status: 500 });

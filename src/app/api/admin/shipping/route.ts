@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getAuthAdmin, prisma } from "@/lib/auth";
 import { shippingRateSchema } from "@/lib/validation";
 import { z } from "zod";
+import { revalidatePath } from "next/cache";
 
 const shippingUpdateSchema = z.object({
   rates: z.array(shippingRateSchema).min(1),
@@ -55,6 +56,7 @@ export async function PUT(request: Request) {
       )
     );
 
+    revalidatePath("/", "layout");
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json(

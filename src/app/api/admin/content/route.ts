@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthAdmin, prisma } from "@/lib/auth";
+import { revalidatePath } from "next/cache";
 
 export async function GET(req: NextRequest) {
   const admin = await getAuthAdmin(req);
@@ -48,23 +49,23 @@ export async function POST(req: NextRequest) {
     switch (type) {
       case "faq": {
         const faq = await prisma.faq.create({ data: body });
-        return NextResponse.json({ faq });
+        revalidatePath("/", "layout"); return NextResponse.json({ faq });
       }
       case "whyus": {
         const item = await prisma.whyUsItem.create({ data: body });
-        return NextResponse.json({ item });
+        revalidatePath("/", "layout"); return NextResponse.json({ item });
       }
       case "brands": {
         const brand = await prisma.brandItem.create({ data: body });
-        return NextResponse.json({ brand });
+        revalidatePath("/", "layout"); return NextResponse.json({ brand });
       }
       case "categories": {
         const cat = await prisma.categoryContent.create({ data: body });
-        return NextResponse.json({ cat });
+        revalidatePath("/", "layout"); return NextResponse.json({ cat });
       }
       case "footer": {
         const link = await prisma.footerLink.create({ data: body });
-        return NextResponse.json({ link });
+        revalidatePath("/", "layout"); return NextResponse.json({ link });
       }
       default:
         return NextResponse.json({ error: "Invalid type" }, { status: 400 });
@@ -85,23 +86,23 @@ export async function PUT(req: NextRequest) {
     switch (type) {
       case "faq": {
         const faq = await prisma.faq.update({ where: { id }, data });
-        return NextResponse.json({ faq });
+        revalidatePath("/", "layout"); return NextResponse.json({ faq });
       }
       case "whyus": {
         const item = await prisma.whyUsItem.update({ where: { id }, data });
-        return NextResponse.json({ item });
+        revalidatePath("/", "layout"); return NextResponse.json({ item });
       }
       case "brands": {
         const brand = await prisma.brandItem.update({ where: { id }, data });
-        return NextResponse.json({ brand });
+        revalidatePath("/", "layout"); return NextResponse.json({ brand });
       }
       case "categories": {
         const cat = await prisma.categoryContent.update({ where: { id }, data });
-        return NextResponse.json({ cat });
+        revalidatePath("/", "layout"); return NextResponse.json({ cat });
       }
       case "footer": {
         const link = await prisma.footerLink.update({ where: { id }, data });
-        return NextResponse.json({ link });
+        revalidatePath("/", "layout"); return NextResponse.json({ link });
       }
       default:
         return NextResponse.json({ error: "Invalid type" }, { status: 400 });
@@ -126,6 +127,7 @@ export async function DELETE(req: NextRequest) {
       case "footer": await prisma.footerLink.delete({ where: { id } }); break;
       default: return NextResponse.json({ error: "Invalid type" }, { status: 400 });
     }
+    revalidatePath("/", "layout");
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: "Failed to delete" }, { status: 500 });

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAuthAdmin, prisma } from "@/lib/auth";
 import { productSchema } from "@/lib/validation";
+import { revalidatePath } from "next/cache";
 
 export async function GET(request: Request) {
   const admin = await getAuthAdmin(request);
@@ -107,6 +108,7 @@ export async function POST(request: Request) {
       return p;
     });
 
+    revalidatePath("/", "layout");
     return NextResponse.json({ success: true, product });
   } catch {
     return NextResponse.json(
@@ -187,6 +189,7 @@ export async function PUT(request: Request) {
       return updated;
     });
 
+    revalidatePath("/", "layout");
     return NextResponse.json({ success: true, product });
   } catch (error) {
     if (error instanceof Error && error.message === "PRODUCT_NOT_FOUND") {
@@ -222,6 +225,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
+    revalidatePath("/", "layout");
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json(
