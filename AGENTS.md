@@ -18,11 +18,30 @@
 - **No test framework** set up
 
 ## Key structure
-- `src/app/page.tsx` — homepage (Hero, Marquee, Categories, WhyUs, FAQSection — all inline components)
-- `src/app/admin/page.tsx` — single-page admin (login gate + orders/products/shipping/content tabs)
-- `src/components/` — Header, Footer, CartDrawer, ProductCard, ProductModal, AdminContent
+- `src/app/page.tsx` — homepage (Hero, Marquee, CategoryCard, Products, WhyUs, FAQSection — all inline components)
+- `src/app/admin/page.tsx` — single-page admin (login gate + orders/products/shipping/content/landing tabs)
+- `src/components/` — Header, Footer, CartDrawer, ProductCard, ProductModal, AdminContent, AdminLanding, AdminSlides
 - `src/data/dictionary.ts` — all translations (FR/AR/EN) via `useLang()` / `t("key")`, plus FAQ_DATA fallback
 - `src/contexts/LangContext.tsx` — language state
+
+## Homepage structure (top→bottom)
+1. **Promo bar** — reads from `landingSettings["promo_*"]` keys (text, visibility, colors, size, padding). Fully customizable from admin `landing` tab.
+2. **Hero** — "LIKE IT. WANT IT. COP IT." with two CTAs: Voir le Drop + Promos
+3. **Marquee** — CSS-animated brand ticker (NIKE, ADIDAS, ASICS, NB, JORDAN, COPIT, PUMA, CONVERSE). No JS, pure `@keyframes marqueeScroll`. Respects `prefers-reduced-motion`.
+4. **CategoryCard** — single large horizontal card for `Chaussures` slug from DB → scrolls to `#sneakers-section`. Shows **nothing** if Chaussures doesn't exist in DB (no fallback categories).
+5. **Dernières Sneakers** — product section anchored at `#sneakers-section`. Fetches `/api/products?limit=4&category=Chaussures`. No "Tout voir" button.
+6. **Why Us** — 4 icon cards from DB or fallback.
+7. **FAQ** — accordion from DB or fallback.
+8. **Footer** — logo, phone, social, legal links.
+9. **Floating cart** — fixed bottom-right button.
+
+## Category system
+- **Source of truth**: `CategoryContent` model in DB with `active`, `slug`, `order`, `imageUrl`, trilingual names
+- **Public API**: `GET /api/content?type=categories` — returns only `active: true` categories
+- **Admin API**: `GET|POST|PUT|DELETE /api/admin/content?type=categories` — full CRUD
+- **Homepage**: finds `slug === "Chaussures"` from API data. If missing or empty, no category renders.
+- **No hardcoded fallback** — deleted categories fully disappear.
+- **Navigation** (Header.tsx) nav links are **still hardcoded** — `/shop?category=Chaussures` etc.
 
 - **Backup at** `C:\Users\TADJER\Documents\New OpenCode Project\copit-app-backup` — restore code by copying `src/`, `prisma/`, config files back
 
