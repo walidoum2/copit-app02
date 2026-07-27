@@ -18,7 +18,8 @@ interface ShippingRate { wilaya: string; homePrice: number; stopPrice: number; d
 interface Product { id: string; name: string; brand: string; category: string; price: number; originalPrice: number; material: string; sku: string; tag: string; active: boolean; position: number; variants: { id?: string; size: string; color: string; colorHex: string; stock: number }[]; images: { id?: string; url: string; alt?: string }[]; }
 
 const DEFAULT_VARIANT = { size: "", color: "", colorHex: "#888888", stock: 0 };
-const EMPTY_PRODUCT: Product = { id: "", name: "", brand: "CopIt Basics", category: "Chaussures", price: 0, originalPrice: 0, material: "", sku: "", tag: "", active: true, position: 0, variants: [{ ...DEFAULT_VARIANT }], images: [] };
+const CATEGORIES = ["Sneakers", "Vêtements", "Promotions", "Accessoires", "Sacs", "Jordan", "Nike", "Adidas", "Puma", "Converse", "New Balance", "Other"];
+const EMPTY_PRODUCT: Product = { id: "", name: "", brand: "CopIt Basics", category: "Sneakers", price: 0, originalPrice: 0, material: "", sku: "", tag: "", active: true, position: 0, variants: [{ ...DEFAULT_VARIANT }], images: [] };
 
 function ProductFormInner({ product: prod, onSave, onCancel, showToast, saving }: { product: Product; onSave: (p: Product) => void; onCancel: () => void; showToast: (msg: string) => void; saving: boolean }) {
   const { t } = useLang();
@@ -68,7 +69,7 @@ function ProductFormInner({ product: prod, onSave, onCancel, showToast, saving }
         <div className="field"><label>Brand</label><input value={form.brand} onChange={e => updateField("brand", e.target.value)} /></div>
       </div>
       <div className="frow">
-        <div className="field"><label>Category</label><input value={form.category} onChange={e => updateField("category", e.target.value)} /></div>
+        <div className="field"><label>Category</label><select value={form.category} onChange={e => updateField("category", e.target.value)} style={{ background: "var(--bg3)", border: "1px solid var(--line)", color: "var(--text)", padding: "12px 14px", fontSize: 14, borderRadius: "var(--radius-sm)", fontFamily: "inherit", width: "100%" }}>{CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
         <div className="field"><label>SKU</label><input value={form.sku} onChange={e => updateField("sku", e.target.value)} /></div>
       </div>
       <div className="frow">
@@ -104,11 +105,9 @@ function ProductFormInner({ product: prod, onSave, onCancel, showToast, saving }
               <button type="button" onClick={() => removeImage(i)} style={{ position: "absolute", top: 2, right: 2, width: 18, height: 18, background: "rgba(0,0,0,0.7)", border: "none", color: "#fff", fontSize: 11, borderRadius: "50%", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>×</button>
             </div>
           ))}
-          {form.images.length < 4 && (
-            <label style={{ width: 70, height: 70, border: "1px dashed var(--line)", borderRadius: 2, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 22, color: "var(--steel)" }}>
-              +<input type="file" accept="image/*" style={{ display: "none" }} onChange={handleFileUpload} />
-            </label>
-          )}
+          <label style={{ width: 70, height: 70, border: "1px dashed var(--line)", borderRadius: 2, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 22, color: "var(--steel)" }}>
+            +<input type="file" accept="image/*" style={{ display: "none" }} onChange={handleFileUpload} />
+          </label>
         </div>
       </div>
       <div style={{ display: "flex", gap: 10, marginTop: 20 }}>

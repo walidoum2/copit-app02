@@ -31,10 +31,7 @@ function useScrollReveal() {
 }
 
 function Marquee() {
-  const { lang } = useLang();
-  const items = lang === "ar"
-    ? ["نايك", "أديداس", "أسيكس", "نيو بالانس", "جوردن", "كوب إت", "بوما", "كونفيرس"]
-    : ["NIKE", "ADIDAS", "ASICS", "NEW BALANCE", "JORDAN", "COPIT", "PUMA", "CONVERSE"];
+  const items = ["Golden Goose", "Maison Margiela", "DC Shoes", "Dr. Martens", "Under Armour", "Chanel", "Louboutin", "Isabel Marant"];
   return (
     <div className="marquee" role="presentation" aria-hidden="true">
       <div className="marquee-track">
@@ -169,6 +166,8 @@ function FAQSection({ faqs: dbFaqs, lang, t }: { faqs: FaqEntry[]; lang: string;
   );
 }
 
+const HOME_PAGE_SIZE = 10;
+
 export default function HomePage() {
   const [cartOpen, setCartOpen] = useState(false);
   const [products, setProducts] = useState<ProductData[]>([]);
@@ -176,6 +175,8 @@ export default function HomePage() {
   const [toastMsg, setToastMsg] = useState("");
   const [productsError, setProductsError] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [totalProducts, setTotalProducts] = useState(0);
   const [faqs, setFaqs] = useState<FaqEntry[]>([]);
   const [whyus, setWhyus] = useState<WhyItem[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
@@ -188,14 +189,16 @@ export default function HomePage() {
   useEffect(() => {
     const ts = Date.now();
     Promise.all([
-      fetch(`/api/products?category=Chaussures&_t=${ts}`).then(r => r.json()),
+      fetch(`/api/products?category=Chaussures&page=1&limit=${HOME_PAGE_SIZE}&_t=${ts}`).then(r => r.json()),
       fetch(`/api/content?type=faq&_t=${ts}`).then(r => r.json()),
       fetch(`/api/content?type=whyus&_t=${ts}`).then(r => r.json()),
       fetch(`/api/content?type=categories&_t=${ts}`).then(r => r.json()),
       fetch(`/api/landing?_t=${ts}`).then(r => r.json()),
     ]).then(([prodD, faqD, whyD, catD, landD]) => {
-      if (prodD.products) setProducts(prodD.products);
-      else setProductsError(true);
+      if (prodD.products) {
+        setProducts(prodD.products);
+        setTotalProducts(prodD.pagination?.total || 0);
+      } else setProductsError(true);
       if (faqD.faqs?.length) setFaqs(faqD.faqs);
       if (whyD.items?.length) setWhyus(whyD.items);
       if (catD.categories?.length) setCategories(catD.categories);
@@ -203,6 +206,21 @@ export default function HomePage() {
     }).catch(() => setProductsError(true))
     .finally(() => setDataLoaded(true));
   }, []);
+
+  async function loadMore() {
+    setLoadingMore(true);
+    const nextPage = Math.floor(products.length / HOME_PAGE_SIZE) + 1;
+    try {
+      const res = await fetch(`/api/products?category=Chaussures&page=${nextPage}&limit=${HOME_PAGE_SIZE}&_t=${Date.now()}`);
+      const d = await res.json();
+      if (d.products?.length) {
+        const existing = new Set(products.map(p => p.id));
+        const fresh = d.products.filter((p: ProductData) => !existing.has(p.id));
+        setProducts(prev => [...prev, ...fresh]);
+      }
+    } catch {}
+    setLoadingMore(false);
+  }
 
   useScrollReveal();
 
@@ -280,9 +298,14 @@ export default function HomePage() {
             )}
           </div>
           {dataLoaded && !productsError && products.length > 0 && (
-            <div style={{ textAlign: "center", marginTop: 36 }}>
+            <div style={{ textAlign: "center", marginTop: 36, display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+              {products.length < totalProducts && (
+                <button className="btn-premium-outline" onClick={loadMore} disabled={loadingMore} style={{ border: "none", background: "var(--text)", color: "var(--bg)" }}>
+                  {loadingMore ? "..." : lang === "ar" ? "تحميل المزيد" : "LOAD MORE"}
+                </button>
+              )}
               <a href="/shop?category=Chaussures" className="btn-premium-outline">
-                {lang === "ar" ? "عرض الكل ←" : "TOUT VOIR →"}
+                {lang === "ar" ? "عرض الكل" : "TOUT VOIR"}
               </a>
             </div>
           )}

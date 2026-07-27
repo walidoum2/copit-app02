@@ -1,20 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useLang } from "@/contexts/LangContext";
 import type { ProductData } from "./ProductCard";
-
-const PALETTE: Record<string, [string, string]> = {
-  "CP-DM-1460": ["#e8ddd6", "#d4c9bf"],
-  "CP-UA-HP3": ["#d6d9de", "#c4c7cc"],
-  "CP-PM-LFR": ["#e0e0e6", "#ceced4"],
-  "CP-OS-D3": ["#d8dfd8", "#c6cdc6"],
-  "CP-JD-ARC": ["#e3d0d0", "#d4bebe"],
-  "CP-BS-HD1": ["#dcdcde", "#cacacc"],
-  "CP-BS-CG1": ["#dadcd6", "#c8cac4"],
-  "CP-BS-BK1": ["#ddd5ce", "#ccc4bc"],
-};
 
 function money(n: number) { return n.toLocaleString("fr-FR") + " DA"; }
 
@@ -30,14 +19,36 @@ export default function ProductModal({
   const { t } = useLang();
   const [selSize, setSelSize] = useState<string | null>(null);
   const [selColor, setSelColor] = useState(0);
+  const [imgIdx, setImgIdx] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   if (!product) return null;
 
+  const images = product.images || [];
   const colors = [...new Set(product.variants.map((v) => v.color))];
   const sizes = [...new Set(product.variants.map((v) => v.size))];
   const totalStock = product.variants.reduce((a, v) => a + v.stock, 0);
-  const [sw1, sw2] = PALETTE[product.sku] || ["#f0f0ec", "#e4e4df"];
-  const mainImg = product.images?.[0]?.url;
+
+  useEffect(() => {
+    setImgIdx(0);
+    setSelSize(null);
+    setSelColor(0);
+  }, [product?.id]);
+
+  useEffect(() => {
+    if (images.length < 2 || paused) {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      return;
+    }
+    intervalRef.current = setInterval(() => {
+      setImgIdx(prev => (prev + 1) % images.length);
+    }, 4000);
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, [images.length, paused, imgIdx]);
+
+  function nextImg() { setImgIdx(prev => (prev + 1) % images.length); }
+  function prevImg() { setImgIdx(prev => (prev - 1 + images.length) % images.length); }
 
   function getStock(size: string, color: string) {
     const v = product!.variants.find((vv) => vv.size === size && vv.color === color);
@@ -75,9 +86,22 @@ export default function ProductModal({
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12" /></svg>
         </button>
         <div className="pmodal-grid">
-          <div className="pmodal-img" style={mainImg ? {} : { "--sw1": sw1, "--sw2": sw2 } as React.CSSProperties}>
-            {mainImg ? (
-              <img src={mainImg} alt={product!.name} />
+          <div className="pmodal-img" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
+            {images.length > 0 ? (
+              <>
+                <img src={images[imgIdx].url} alt={product!.name} style={{ transition: "opacity 0.4s ease" }} />
+                {images.length > 1 && (
+                  <>
+                    <button className="gal-arrow gal-arrow-left" onClick={(e) => { e.stopPropagation(); prevImg(); }} aria-label="Previous">‹</button>
+                    <button className="gal-arrow gal-arrow-right" onClick={(e) => { e.stopPropagation(); nextImg(); }} aria-label="Next">›</button>
+                    <div className="gal-dots">
+                      {images.map((_, i) => (
+                        <span key={i} className={`gal-dot${i === imgIdx ? " active" : ""}`} onClick={(e) => { e.stopPropagation(); setImgIdx(i); }} />
+                      ))}
+                    </div>
+                  </>
+                )}
+              </>
             ) : (
               <svg viewBox="0 0 200 130" width="52%" fill="none" stroke="currentColor" strokeWidth="1.2">
                 <path d="M10 95c0-8 8-14 18-16 12-2 20-10 30-14 14-6 30-6 42 2 6 4 10 4 18 2 14-4 30 0 42 10 8 6 12 8 20 8 6 0 8 4 8 8v8c0 4-3 7-7 7H17c-4 0-7-3-7-7v-8z" />

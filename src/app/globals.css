@@ -256,6 +256,8 @@ section { padding: 60px 0; }
 .cat-card-horizontal:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
 .cat-card-loading { background: var(--bg2); animation: shimmer 1.8s ease-in-out infinite; background-image: linear-gradient(90deg, var(--bg2) 0%, var(--bg3) 50%, var(--bg2) 100%); background-size: 200% 100%; }
 .cat-card-loading .cat-content h3 { color: var(--text-dim); }
+.marquee + section.wrap { margin-top: 40px; }
+@media (max-width: 768px) { .marquee + section.wrap { margin-top: 28px; } }
 .cat-card-horizontal .cat-img-wrap { position: absolute; inset: 0; }
 .cat-card-horizontal .cat-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s var(--ease); }
 .cat-card-horizontal:hover .cat-img { transform: scale(1.06); }
@@ -581,7 +583,7 @@ footer { background: var(--bg); border-top: 1px solid var(--line); padding: 48px
 .pmodal-close:hover { background: var(--bg); }
 .pmodal-close svg { width: 16px; height: 16px; }
 .pmodal-grid { display: grid; grid-template-columns: 1fr 1fr; }
-.pmodal-img { aspect-ratio: 1/1; background: var(--bg3); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.pmodal-img { aspect-ratio: 1/1; background: var(--bg3); display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
 .pmodal-img img { width: 100%; height: 100%; object-fit: cover; }
 .pmodal-img svg { width: 52%; height: 52%; opacity: 0.2; color: var(--text-dim); }
 .pmodal-info { padding: 32px 34px; display: flex; flex-direction: column; gap: 4px; }
@@ -607,6 +609,15 @@ footer { background: var(--bg); border-top: 1px solid var(--line); padding: 48px
 .spec-list { margin-top: 20px; border-top: 1px solid var(--line); padding-top: 16px; }
 .spec-row { display: flex; justify-content: space-between; padding: 10px 0; font-size: 13px; border-bottom: 1px solid var(--line); }
 .spec-row span:first-child { color: var(--text-dim); }
+
+/* Image gallery arrows & dots */
+.gal-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 3; background: rgba(0,0,0,0.5); color: #fff; border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .2s; line-height: 1; }
+.gal-arrow:hover { background: rgba(0,0,0,0.8); }
+.gal-arrow-left { left: 12px; }
+.gal-arrow-right { right: 12px; }
+.gal-dots { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 3; }
+.gal-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.4); cursor: pointer; transition: background .2s; }
+.gal-dot.active { background: #fff; }
 
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
