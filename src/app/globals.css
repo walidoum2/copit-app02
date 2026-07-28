@@ -610,7 +610,10 @@ footer { background: var(--bg); border-top: 1px solid var(--line); padding: 48px
 .spec-row { display: flex; justify-content: space-between; padding: 10px 0; font-size: 13px; border-bottom: 1px solid var(--line); }
 .spec-row span:first-child { color: var(--text-dim); }
 
-/* Image gallery arrows & dots */
+/* Image gallery — crossfade slider */
+.gal-stage { position: relative; width: 100%; height: 100%; }
+.gal-slide { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1); pointer-events: none; }
+.gal-slide.active { opacity: 1; pointer-events: auto; }
 .gal-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 3; background: rgba(0,0,0,0.5); color: #fff; border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .2s; line-height: 1; }
 .gal-arrow:hover { background: rgba(0,0,0,0.8); }
 .gal-arrow-left { left: 12px; }

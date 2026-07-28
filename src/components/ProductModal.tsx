@@ -22,30 +22,35 @@ export default function ProductModal({
   const [imgIdx, setImgIdx] = useState(0);
   const [paused, setPaused] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const lenRef = useRef(0);
+  const prevIdxRef = useRef(0);
 
-  if (!product) return null;
-
-  const images = product.images || [];
-  const colors = [...new Set(product.variants.map((v) => v.color))];
-  const sizes = [...new Set(product.variants.map((v) => v.size))];
-  const totalStock = product.variants.reduce((a, v) => a + v.stock, 0);
+  const images = product?.images || [];
 
   useEffect(() => {
+    if (!product) return;
     setImgIdx(0);
     setSelSize(null);
     setSelColor(0);
   }, [product?.id]);
 
   useEffect(() => {
-    if (images.length < 2 || paused) {
+    lenRef.current = images.length;
+    if (!product || images.length < 2 || paused) {
       if (intervalRef.current) clearInterval(intervalRef.current);
       return;
     }
     intervalRef.current = setInterval(() => {
-      setImgIdx(prev => (prev + 1) % images.length);
+      setImgIdx(prev => (prev + 1) % lenRef.current);
     }, 4000);
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [images.length, paused, imgIdx]);
+  }, [product, images.length, paused]);
+
+  if (!product) return null;
+
+  const colors = [...new Set(product.variants.map((v) => v.color))];
+  const sizes = [...new Set(product.variants.map((v) => v.size))];
+  const totalStock = product.variants.reduce((a, v) => a + v.stock, 0);
 
   function nextImg() { setImgIdx(prev => (prev + 1) % images.length); }
   function prevImg() { setImgIdx(prev => (prev - 1 + images.length) % images.length); }
@@ -89,7 +94,11 @@ export default function ProductModal({
           <div className="pmodal-img" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
             {images.length > 0 ? (
               <>
-                <img src={images[imgIdx].url} alt={product!.name} style={{ transition: "opacity 0.4s ease" }} />
+                <div className="gal-stage">
+                  {images.map((img, i) => (
+                    <img key={i} src={img.url} alt={product!.name} className={`gal-slide${i === imgIdx ? " active" : ""}`} />
+                  ))}
+                </div>
                 {images.length > 1 && (
                   <>
                     <button className="gal-arrow gal-arrow-left" onClick={(e) => { e.stopPropagation(); prevImg(); }} aria-label="Previous">‹</button>

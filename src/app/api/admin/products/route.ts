@@ -82,6 +82,7 @@ export async function POST(request: Request) {
           sku: data.sku,
           tag: data.tag,
           active: data.active ?? true,
+          position: data.position ?? 0,
         },
       });
 

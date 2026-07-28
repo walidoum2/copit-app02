@@ -48,7 +48,7 @@ function SectionBtn({ label, onClick }: { label: string; onClick: () => void }) 
 function FaqEditor({ item, onSave, onCancel }: { item: FaqItem; onSave: (i: FaqItem) => void; onCancel: () => void }) {
   const { t } = useLang();
   const [f, setF] = useState<FaqItem>(() => JSON.parse(JSON.stringify(item)));
-  const set = (k: keyof FaqItem, v: any) => setF({ ...f, [k]: v });
+  const set = (k: keyof FaqItem, v: any) => setF(prev => ({ ...prev, [k]: v }));
   return (
     <div style={{ background: "var(--ink2)", border: "1px solid var(--line)", borderRadius: 2, padding: 20, margin: "12px 0" }}>
       <div className="frow"><div className="field"><label>{t("admin_content_fr")} {t("admin_content_question")}</label><input value={f.questionFr} onChange={e => set("questionFr", e.target.value)} /></div>
@@ -234,7 +234,7 @@ function CategoriesEditor({ item, onSave, onCancel }: { item: CategoryContentIte
 function FooterEditor({ item, onSave, onCancel }: { item: FooterLinkItem; onSave: (i: FooterLinkItem) => void; onCancel: () => void }) {
   const { t } = useLang();
   const [f, setF] = useState<FooterLinkItem>(() => JSON.parse(JSON.stringify(item)));
-  const set = (k: keyof FooterLinkItem, v: any) => setF({ ...f, [k]: v });
+  const set = (k: keyof FooterLinkItem, v: any) => setF(prev => ({ ...prev, [k]: v }));
   return (
     <div style={{ background: "var(--ink2)", border: "1px solid var(--line)", borderRadius: 2, padding: 20, margin: "12px 0" }}>
       <div className="frow">
@@ -324,22 +324,33 @@ export default function AdminContent() {
 
   function loadAll() {
     setLoading(true);
-    Promise.all([
-      fetch("/api/admin/content?type=faq").then(r => r.json()),
-      fetch("/api/admin/content?type=whyus").then(r => r.json()),
-      fetch("/api/admin/content?type=brands").then(r => r.json()),
-      fetch("/api/admin/content?type=categories").then(r => r.json()),
-      fetch("/api/admin/content?type=footer").then(r => r.json()),
-    ]).then(([faqD, whyD, brandD, catD, footD]) => {
-      if (faqD.faqs) setFaqs(faqD.faqs);
-      if (whyD.items) setWhyus(whyD.items);
-      if (brandD.brands) setBrands(brandD.brands);
-      if (catD.categories) setCategories(catD.categories);
-      if (footD.links) setFooter(footD.links);
-    }).catch(() => {}).finally(() => setLoading(false));
+    const endpoints = [
+      { key: "faq", url: "/api/admin/content?type=faq" },
+      { key: "whyus", url: "/api/admin/content?type=whyus" },
+      { key: "brands", url: "/api/admin/content?type=brands" },
+      { key: "categories", url: "/api/admin/content?type=categories" },
+      { key: "footer", url: "/api/admin/content?type=footer" },
+    ] as const;
+    let loaded = 0;
+    endpoints.forEach(({ key, url }) => {
+      fetch(url).then(r => r.json()).then(d => {
+        if (key === "faq" && d.faqs) setFaqs(d.faqs);
+        if (key === "whyus" && d.items) setWhyus(d.items);
+        if (key === "brands" && d.brands) setBrands(d.brands);
+        if (key === "categories" && d.categories) setCategories(d.categories);
+        if (key === "footer" && d.links) setFooter(d.links);
+      }).catch(() => {}).finally(() => { loaded++; if (loaded === endpoints.length) setLoading(false); });
+    });
   }
 
   useEffect(() => { loadAll(); }, []);
+
+  function showToast(msg: string) {
+    const el = document.querySelector(".toast span");
+    if (el) el.textContent = msg;
+    const parent = document.querySelector(".toast");
+    if (parent) { parent.classList.add("show"); setTimeout(() => parent.classList.remove("show"), 2600); }
+  }
 
   async function save(type: ContentType, item: any) {
     const isNew = !item.id;
@@ -349,15 +360,17 @@ export default function AdminContent() {
       body: JSON.stringify(item),
     });
     if (res.ok) loadAll();
+    else showToast("Erreur lors de la sauvegarde");
   }
 
   async function del(type: ContentType, id: string) {
-    await fetch(`/api/admin/content?type=${type}&id=${id}`, { method: "DELETE" });
-    loadAll();
+    const res = await fetch(`/api/admin/content?type=${type}&id=${id}`, { method: "DELETE" });
+    if (res.ok) loadAll();
+    else showToast("Erreur lors de la suppression");
   }
 
   async function moveCategory(id: string, dir: "up" | "down") {
-    const sorted = [...categories].sort((a, b) => a.order - b.order);
+    const sorted = [...categories].sort((a, b) => a.order - b.order).map(c => ({ ...c }));
     const idx = sorted.findIndex(c => c.id === id);
     if (idx === -1) return;
     if (dir === "up" && idx === 0) return;
