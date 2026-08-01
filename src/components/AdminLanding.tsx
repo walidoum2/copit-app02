@@ -2,43 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { useLang } from "@/contexts/LangContext";
+import { LANDING_DEFAULTS } from "@/lib/landing";
 
 interface LandingSettings {
-  promo_text: string;
-  hero_eyebrow: string;
-  hero_title: string;
-  hero_subtitle: string;
-  hero_visual_img: string;
-  hero_visual_sku: string;
-  hero_visual_title: string;
-  hero_visual_stat: string;
-  hero_visual_stat_label: string;
-  new_arrival_title: string;
-  new_arrival_subtitle: string;
-  promo_title: string;
-  promo_subtitle: string;
   [key: string]: string;
 }
 
-const DEFAULT_SETTINGS: LandingSettings = {
-  promo_text: "Promos",
-  hero_eyebrow: "DROP EN COURS — 69 WILAYAS",
-  hero_title: "LIKE IT. WANT IT. COP IT.",
-  hero_subtitle: "Sneakers et streetwear 100% originaux",
-  hero_visual_img: "",
-  hero_visual_sku: "SKU // CP-0192",
-  hero_visual_title: "New Arrival",
-  hero_visual_stat: "28K+",
-  hero_visual_stat_label: "COPPERS",
-  new_arrival_title: "Nouveautés",
-  new_arrival_subtitle: "Fraîchement arrivés cette semaine.",
-  promo_title: "Promotions",
-  promo_subtitle: "Articles en promotion",
-  cat_title: "Shop par catégorie",
-  new_title: "Dernières Sneakers",
-  why_title: "Pourquoi COP chez nous",
-  faq_title: "Questions fréquentes",
-};
+const DEFAULT_SETTINGS: LandingSettings = { ...LANDING_DEFAULTS };
 
 export default function AdminLanding() {
   const { t } = useLang();
@@ -118,6 +88,8 @@ export default function AdminLanding() {
     { key: "hero_eyebrow", label: "Hero - Sur-titre" },
     { key: "hero_title", label: "Hero - Titre principal" },
     { key: "hero_subtitle", label: "Hero - Sous-titre" },
+    { key: "hero_cta1", label: "Hero - Bouton principal (Voir le Drop)" },
+    { key: "hero_cta2", label: "Hero - Bouton secondaire (Promos)" },
     { key: "hero_visual_img", label: "Hero - Image (upload ou URL)" },
     { key: "hero_visual_sku", label: "Hero - SKU affiché" },
     { key: "hero_visual_title", label: "Hero - Titre du produit" },
@@ -128,9 +100,15 @@ export default function AdminLanding() {
     { key: "promo_title", label: "Promotions - Titre" },
     { key: "promo_subtitle", label: "Promotions - Sous-titre" },
     { key: "cat_title", label: "Shop par catégorie - Titre" },
+    { key: "cat_cta", label: "Carte catégorie - Bouton (ex: Le Shop)" },
     { key: "new_title", label: "Produits - Titre (Dernières Sneakers)" },
     { key: "why_title", label: "Pourquoi nous - Titre" },
+    { key: "why_badge", label: "Pourquoi nous - Badge (Authenticité vérifiée)" },
     { key: "faq_title", label: "FAQ - Titre" },
+    { key: "btn_voir_plus", label: "Bouton - VOIR PLUS" },
+    { key: "btn_tout_voir", label: "Bouton - TOUT VOIR" },
+    { key: "foot_phone", label: "Footer - Téléphone" },
+    { key: "foot_rights", label: "Footer - Droits réservés" },
     { key: "banner_chaussures_img", label: "Bannière Chaussures - Image (upload ou URL)" },
     { key: "banner_promo_img", label: "Bannière Promotions - Image (upload ou URL)" },
   ];

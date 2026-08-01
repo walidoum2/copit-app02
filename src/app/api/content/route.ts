@@ -23,6 +23,10 @@ export async function GET(req: NextRequest) {
         const categories = await prisma.categoryContent.findMany({ where: { active: true }, orderBy: { order: "asc" } });
         return NextResponse.json({ categories });
       }
+      case "footer": {
+        const links = await prisma.footerLink.findMany({ where: { active: true }, orderBy: { order: "asc" } });
+        return NextResponse.json({ links });
+      }
       default:
         return NextResponse.json({ error: "Invalid type" }, { status: 400 });
     }

@@ -31,13 +31,13 @@ function useScrollReveal() {
 }
 
 function Marquee({ brands }: { brands: string[] }) {
-  const items = brands.length > 0 ? brands : ["Golden Goose", "Maison Margiela", "DC Shoes", "Dr. Martens", "Under Armour", "Chanel", "Louboutin", "Isabel Marant"];
+  if (!brands.length) return null;
   return (
     <div className="marquee" role="presentation" aria-hidden="true">
       <div className="marquee-track">
         {[0, 1].map((i) => (
           <div key={i} className="marquee-content">
-            {items.map((item, j) => (
+            {brands.map((item, j) => (
               <span key={j}>{item}</span>
             ))}
             {i === 0 && <span className="marquee-dot">✦</span>}
@@ -49,7 +49,7 @@ function Marquee({ brands }: { brands: string[] }) {
 }
 
 function CategoryCard({ categories, dataLoaded, lang, t, landingSettings }: { categories: any[]; dataLoaded: boolean; lang: string; t: (k: string) => string; landingSettings: Record<string, string> }) {
-  const L = (key: string, fallback: string) => landingSettings[key] || fallback;
+  const L = (key: string, fallback: string) => (key in landingSettings ? landingSettings[key] : fallback);
   const cat = categories.find((c: any) => c.slug === "Chaussures");
   const nameKey = lang === "ar" ? "nameAr" : lang === "en" ? "nameEn" : "nameFr" as string;
   const fallbackImg = cat?.imageUrl || "";
@@ -86,7 +86,7 @@ function CategoryCard({ categories, dataLoaded, lang, t, landingSettings }: { ca
         )}
         <div className="cat-content">
           <h3>{cat[nameKey]}</h3>
-          <span className="cat-cta">{lang === "ar" ? "تسوق الآن ←" : "LE SHOP →"}</span>
+          <span className="cat-cta">{L("cat_cta", t("cat_cta"))}</span>
         </div>
       </a>
     </section>
@@ -107,6 +107,7 @@ function WhyIcon({ name, size = 24 }: { name: string; size?: number }) {
 interface WhyItem { icon: string; imageUrl?: string; headingFr: string; headingAr: string; headingEn: string; paragraphFr: string; paragraphAr: string; paragraphEn: string; }
 
 function WhyUs({ items: dbItems, lang, t, landingSettings }: { items: WhyItem[]; lang: string; t: (k: string) => string; landingSettings: Record<string, string> }) {
+  const L = (key: string, fallback: string) => (key in landingSettings ? landingSettings[key] : fallback);
   const fallback: WhyItem[] = [
     { icon: "check", headingFr: "Original Garanti", headingAr: "أصلي مضمون", headingEn: "Authentic Guaranteed", paragraphFr: "Tous nos produits sont 100% authentiques.", paragraphAr: "جميع منتجاتنا أصلية 100%", paragraphEn: "All products 100% authentic" },
     { icon: "truck", headingFr: "Livraison 69 Wilayas", headingAr: "توصيل 69 ولاية", headingEn: "69 Wilayas Covered", paragraphFr: "Livraison rapide dans toute l'Algérie.", paragraphAr: "توصيل سريع في جميع أنحاء الجزائر", paragraphEn: "Fast delivery across Algeria" },
@@ -126,7 +127,7 @@ function WhyUs({ items: dbItems, lang, t, landingSettings }: { items: WhyItem[];
           <div key={i} className="why-card-premium">
             {i === 0 && <div className="why-auth-premium">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
-              <span>{lang === "ar" ? "أصلي مضمون" : "AUTHENTICITÉ VÉRIFIÉE"}</span>
+              <span>{L("why_badge", t("why_badge"))}</span>
             </div>}
             <WhyIcon name={item.icon} size={24} />
             <h4>{item[hKey]}</h4>
@@ -186,7 +187,7 @@ export default function HomePage() {
   const { t, lang } = useLang();
   const { count } = useCart();
 
-  const L = (key: string, fallback: string) => landingSettings[key] || fallback;
+  const L = (key: string, fallback: string) => (key in landingSettings ? landingSettings[key] : fallback);
 
   useEffect(() => {
     const ts = Date.now();
@@ -256,7 +257,7 @@ export default function HomePage() {
 
       {promoVisible && (
         <div className="promo-bar" style={promoInline as React.CSSProperties}>
-          <span>{L("promo_text", lang === "ar" ? "توصيل مجاني للطلبيات فوق 15000 دج" : "LIVRAISON OFFERTE DÈS 15 000 DA")}</span>
+          <span>{L("promo_text", t("promo_text"))}</span>
         </div>
       )}
 
@@ -264,17 +265,17 @@ export default function HomePage() {
         <div className="wrap">
           <h1 className="hero-premium-title">
             {(() => {
-              const raw = L("hero_title", "LIKE IT. WANT IT. COP IT.");
+              const raw = L("hero_title", t("hero_title"));
               const lines = raw.split("|").map(s => s.trim()).filter(Boolean);
               return lines.length >= 2 ? lines.map((line, i) => (
                 <span key={i} className={`hero-line${i === lines.length - 1 ? " hero-line-highlight" : ""}`}>{line}</span>
               )) : <span className="hero-line hero-line-highlight">{raw}</span>;
             })()}
           </h1>
-          <p className="hero-premium-sub">{L("hero_subtitle", lang === "ar" ? "سنيكرز وستريتوير أصلية 100%" : "SNEAKERS & STREETWEAR 100% ORIGINAUX")}</p>
+          <p className="hero-premium-sub">{L("hero_subtitle", t("hero_subtitle"))}</p>
           <div className="hero-premium-actions">
-            <a href="/shop" className="btn-premium-primary">{t("hero_cta1")}</a>
-            <a href="/shop?promo=true" className="btn-premium-secondary">★ {t("promo_btn")}</a>
+            <a href="/shop" className="btn-premium-primary">{L("hero_cta1", t("hero_cta1"))}</a>
+            <a href="/shop?promo=true" className="btn-premium-secondary">{L("hero_cta2", t("promo_btn"))}</a>
           </div>
         </div>
       </section>
@@ -297,7 +298,7 @@ export default function HomePage() {
               <p style={{ color: "var(--text-dim)", fontSize: 13, gridColumn: "1 / -1", textAlign: "center", padding: 40 }}>{t("home_products_error")}</p>
             ) : products.length === 0 ? (
               <p style={{ color: "var(--text-dim)", fontSize: 13, gridColumn: "1 / -1", textAlign: "center", padding: 40 }}>
-                {lang === "ar" ? "لا توجد منتجات متاحة حالياً" : "Aucun produit disponible pour le moment"}
+                {t("home_products_empty")}
               </p>
             ) : (
               [...products].sort((a, b) => (a.position || 0) - (b.position || 0)).map((p) => (
@@ -306,14 +307,14 @@ export default function HomePage() {
             )}
           </div>
           {dataLoaded && !productsError && products.length > 0 && (
-            <div style={{ textAlign: "center", marginTop: 36, display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+            <div style={{ textAlign: "center", marginTop: 48, display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
               {products.length < totalProducts && (
                 <button className="btn-premium-outline" onClick={loadMore} disabled={loadingMore} style={{ border: "none", background: "var(--text)", color: "var(--bg)" }}>
-                  {loadingMore ? "..." : lang === "ar" ? "عرض المزيد" : "VOIR PLUS"}
+                  {loadingMore ? "..." : L("btn_voir_plus", t("btn_voir_plus"))}
                 </button>
               )}
               <a href="/shop?category=Chaussures" className="btn-premium-outline">
-                {lang === "ar" ? "عرض الكل" : "TOUT VOIR"}
+                {L("btn_tout_voir", t("btn_tout_voir"))}
               </a>
             </div>
           )}
