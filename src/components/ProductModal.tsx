@@ -21,6 +21,7 @@ export default function ProductModal({
   const [selColor, setSelColor] = useState(0);
   const [imgIdx, setImgIdx] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [zoomed, setZoomed] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lenRef = useRef(0);
   const touchStartRef = useRef(0);
@@ -33,6 +34,7 @@ export default function ProductModal({
     setImgIdx(0);
     setSelSize(null);
     setSelColor(0);
+    setZoomed(false);
   }, [product?.id]);
 
   useEffect(() => {
@@ -101,10 +103,10 @@ export default function ProductModal({
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12" /></svg>
         </button>
         <div className="pmodal-grid">
-          <div className="pmodal-img" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
+          <div className={`pmodal-img${zoomed ? " zoomed" : ""}`} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} onClick={() => setZoomed(!zoomed)} style={{ cursor: zoomed ? "zoom-out" : "zoom-in" }}>
             {images.length > 0 ? (
               <>
-                <div className="gal-stage" onClick={() => images.length > 1 && nextImg()}>
+                <div className="gal-stage">
                   {images.map((img, i) => (
                     <img key={i} src={img.url} alt={product!.name} className={`gal-slide${i === imgIdx ? " active" : ""}`} loading="lazy" />
                   ))}
