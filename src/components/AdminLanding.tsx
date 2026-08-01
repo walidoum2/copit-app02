@@ -34,6 +34,10 @@ const DEFAULT_SETTINGS: LandingSettings = {
   new_arrival_subtitle: "Fraîchement arrivés cette semaine.",
   promo_title: "Promotions",
   promo_subtitle: "Articles en promotion",
+  cat_title: "Shop par catégorie",
+  new_title: "Dernières Sneakers",
+  why_title: "Pourquoi COP chez nous",
+  faq_title: "Questions fréquentes",
 };
 
 export default function AdminLanding() {
@@ -123,6 +127,10 @@ export default function AdminLanding() {
     { key: "new_arrival_subtitle", label: "Nouveautés - Sous-titre" },
     { key: "promo_title", label: "Promotions - Titre" },
     { key: "promo_subtitle", label: "Promotions - Sous-titre" },
+    { key: "cat_title", label: "Shop par catégorie - Titre" },
+    { key: "new_title", label: "Produits - Titre (Dernières Sneakers)" },
+    { key: "why_title", label: "Pourquoi nous - Titre" },
+    { key: "faq_title", label: "FAQ - Titre" },
     { key: "banner_chaussures_img", label: "Bannière Chaussures - Image (upload ou URL)" },
     { key: "banner_promo_img", label: "Bannière Promotions - Image (upload ou URL)" },
   ];

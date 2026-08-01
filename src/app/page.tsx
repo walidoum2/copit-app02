@@ -30,8 +30,8 @@ function useScrollReveal() {
   }, []);
 }
 
-function Marquee() {
-  const items = ["Golden Goose", "Maison Margiela", "DC Shoes", "Dr. Martens", "Under Armour", "Chanel", "Louboutin", "Isabel Marant"];
+function Marquee({ brands }: { brands: string[] }) {
+  const items = brands.length > 0 ? brands : ["Golden Goose", "Maison Margiela", "DC Shoes", "Dr. Martens", "Under Armour", "Chanel", "Louboutin", "Isabel Marant"];
   return (
     <div className="marquee" role="presentation" aria-hidden="true">
       <div className="marquee-track">
@@ -48,7 +48,8 @@ function Marquee() {
   );
 }
 
-function CategoryCard({ categories, dataLoaded, lang, t }: { categories: any[]; dataLoaded: boolean; lang: string; t: (k: string) => string }) {
+function CategoryCard({ categories, dataLoaded, lang, t, landingSettings }: { categories: any[]; dataLoaded: boolean; lang: string; t: (k: string) => string; landingSettings: Record<string, string> }) {
+  const L = (key: string, fallback: string) => landingSettings[key] || fallback;
   const cat = categories.find((c: any) => c.slug === "Chaussures");
   const nameKey = lang === "ar" ? "nameAr" : lang === "en" ? "nameEn" : "nameFr" as string;
   const fallbackImg = cat?.imageUrl || "";
@@ -67,7 +68,7 @@ function CategoryCard({ categories, dataLoaded, lang, t }: { categories: any[]; 
   return (
     <section className="wrap" data-reveal>
       <div className="section-head-alt">
-        <h2>{t("cat_title")}</h2>
+        <h2>{L("cat_title", t("cat_title"))}</h2>
       </div>
       <a href="/shop?category=Chaussures" className="cat-card-horizontal">
         {imgSrc && !imgFailed ? (
@@ -105,7 +106,7 @@ function WhyIcon({ name, size = 24 }: { name: string; size?: number }) {
 
 interface WhyItem { icon: string; imageUrl?: string; headingFr: string; headingAr: string; headingEn: string; paragraphFr: string; paragraphAr: string; paragraphEn: string; }
 
-function WhyUs({ items: dbItems, lang, t }: { items: WhyItem[]; lang: string; t: (k: string) => string }) {
+function WhyUs({ items: dbItems, lang, t, landingSettings }: { items: WhyItem[]; lang: string; t: (k: string) => string; landingSettings: Record<string, string> }) {
   const fallback: WhyItem[] = [
     { icon: "check", headingFr: "Original Garanti", headingAr: "أصلي مضمون", headingEn: "Authentic Guaranteed", paragraphFr: "Tous nos produits sont 100% authentiques.", paragraphAr: "جميع منتجاتنا أصلية 100%", paragraphEn: "All products 100% authentic" },
     { icon: "truck", headingFr: "Livraison 69 Wilayas", headingAr: "توصيل 69 ولاية", headingEn: "69 Wilayas Covered", paragraphFr: "Livraison rapide dans toute l'Algérie.", paragraphAr: "توصيل سريع في جميع أنحاء الجزائر", paragraphEn: "Fast delivery across Algeria" },
@@ -118,7 +119,7 @@ function WhyUs({ items: dbItems, lang, t }: { items: WhyItem[]; lang: string; t:
   return (
     <section className="wrap" data-reveal>
       <div className="section-head-alt">
-        <h2>{t("why_title")}</h2>
+        <h2>{(landingSettings["why_title"] || t("why_title"))}</h2>
       </div>
       <div className="why-grid-premium">
         {items.map((item, i) => (
@@ -139,7 +140,7 @@ function WhyUs({ items: dbItems, lang, t }: { items: WhyItem[]; lang: string; t:
 
 interface FaqEntry { questionFr: string; questionAr: string; questionEn: string; answerFr: string; answerAr: string; answerEn: string; }
 
-function FAQSection({ faqs: dbFaqs, lang, t }: { faqs: FaqEntry[]; lang: string; t: (k: string) => string }) {
+function FAQSection({ faqs: dbFaqs, lang, t, landingSettings }: { faqs: FaqEntry[]; lang: string; t: (k: string) => string; landingSettings: Record<string, string> }) {
   const [openIdx, setOpenIdx] = useState(0);
   const faqs = dbFaqs.length > 0 ? dbFaqs : (FAQ_DATA[lang === "ar" ? "ar" : "fr"] || FAQ_DATA.fr).map(f => ({ questionFr: f.q, questionAr: f.q, questionEn: f.q, answerFr: f.a, answerAr: f.a, answerEn: f.a }));
   const qKey = lang === "ar" ? "questionAr" : lang === "en" ? "questionEn" : "questionFr" as keyof FaqEntry;
@@ -147,7 +148,7 @@ function FAQSection({ faqs: dbFaqs, lang, t }: { faqs: FaqEntry[]; lang: string;
   return (
     <section className="wrap" id="faq" data-reveal>
       <div className="section-head-alt">
-        <h2>{t("faq_title")}</h2>
+        <h2>{(landingSettings["faq_title"] || t("faq_title"))}</h2>
       </div>
       <div className="faq-list-premium">
         {faqs.map((f, i) => (
@@ -181,6 +182,7 @@ export default function HomePage() {
   const [whyus, setWhyus] = useState<WhyItem[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [landingSettings, setLandingSettings] = useState<Record<string, string>>({});
+  const [brandNames, setBrandNames] = useState<string[]>([]);
   const { t, lang } = useLang();
   const { count } = useCart();
 
@@ -194,7 +196,8 @@ export default function HomePage() {
       fetch(`/api/content?type=whyus&_t=${ts}`).then(r => r.json()),
       fetch(`/api/content?type=categories&_t=${ts}`).then(r => r.json()),
       fetch(`/api/landing?_t=${ts}`).then(r => r.json()),
-    ]).then(([prodD, faqD, whyD, catD, landD]) => {
+      fetch(`/api/content?type=brands&_t=${ts}`).then(r => r.json()),
+    ]).then(([prodD, faqD, whyD, catD, landD, brandD]) => {
       if (prodD.products) {
         setProducts(prodD.products);
         setTotalProducts(prodD.pagination?.total || 0);
@@ -203,6 +206,7 @@ export default function HomePage() {
       if (whyD.items?.length) setWhyus(whyD.items);
       if (catD.categories?.length) setCategories(catD.categories);
       if (landD.settings) setLandingSettings(landD.settings);
+      if (brandD.brands?.length) setBrandNames(brandD.brands.map((b: any) => b.name));
     }).catch(() => setProductsError(true))
     .finally(() => setDataLoaded(true));
   }, []);
@@ -259,11 +263,15 @@ export default function HomePage() {
       <section className="hero-premium">
         <div className="wrap">
           <h1 className="hero-premium-title">
-            <span className="hero-line">LIKE IT.</span>
-            <span className="hero-line">WANT IT.</span>
-            <span className="hero-line hero-line-highlight">COP IT.</span>
+            {(() => {
+              const raw = L("hero_title", "LIKE IT. WANT IT. COP IT.");
+              const lines = raw.split("|").map(s => s.trim()).filter(Boolean);
+              return lines.length >= 2 ? lines.map((line, i) => (
+                <span key={i} className={`hero-line${i === lines.length - 1 ? " hero-line-highlight" : ""}`}>{line}</span>
+              )) : <span className="hero-line hero-line-highlight">{raw}</span>;
+            })()}
           </h1>
-          <p className="hero-premium-sub">{lang === "ar" ? "سنيكرز وستريتوير أصلية 100%" : "SNEAKERS & STREETWEAR 100% ORIGINAUX"}</p>
+          <p className="hero-premium-sub">{L("hero_subtitle", lang === "ar" ? "سنيكرز وستريتوير أصلية 100%" : "SNEAKERS & STREETWEAR 100% ORIGINAUX")}</p>
           <div className="hero-premium-actions">
             <a href="/shop" className="btn-premium-primary">{t("hero_cta1")}</a>
             <a href="/shop?promo=true" className="btn-premium-secondary">★ {t("promo_btn")}</a>
@@ -271,14 +279,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      <Marquee />
+      <Marquee brands={brandNames} />
 
-      <CategoryCard categories={categories} dataLoaded={dataLoaded} lang={lang} t={t} />
+      <CategoryCard categories={categories} dataLoaded={dataLoaded} lang={lang} t={t} landingSettings={landingSettings} />
 
       <section className="product-section-premium" id="sneakers-section" data-reveal>
         <div className="wrap">
           <div className="section-head-alt">
-            <h2>{t("new_title")}</h2>
+            <h2>{L("new_title", t("new_title"))}</h2>
           </div>
           <div className="grid-products-premium">
             {!dataLoaded ? (
@@ -301,7 +309,7 @@ export default function HomePage() {
             <div style={{ textAlign: "center", marginTop: 36, display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
               {products.length < totalProducts && (
                 <button className="btn-premium-outline" onClick={loadMore} disabled={loadingMore} style={{ border: "none", background: "var(--text)", color: "var(--bg)" }}>
-                  {loadingMore ? "..." : lang === "ar" ? "تحميل المزيد" : "LOAD MORE"}
+                  {loadingMore ? "..." : lang === "ar" ? "عرض المزيد" : "VOIR PLUS"}
                 </button>
               )}
               <a href="/shop?category=Chaussures" className="btn-premium-outline">
@@ -314,9 +322,9 @@ export default function HomePage() {
 
       <div className="hz-divider" />
 
-      <WhyUs items={whyus} lang={lang} t={t} />
+      <WhyUs items={whyus} lang={lang} t={t} landingSettings={landingSettings} />
 
-      <FAQSection faqs={faqs} lang={lang} t={t} />
+      <FAQSection faqs={faqs} lang={lang} t={t} landingSettings={landingSettings} />
 
       <Footer />
 

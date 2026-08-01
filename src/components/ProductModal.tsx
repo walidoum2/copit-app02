@@ -23,7 +23,8 @@ export default function ProductModal({
   const [paused, setPaused] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lenRef = useRef(0);
-  const prevIdxRef = useRef(0);
+  const touchStartRef = useRef(0);
+  const touchEndRef = useRef(0);
 
   const images = product?.images || [];
 
@@ -54,6 +55,15 @@ export default function ProductModal({
 
   function nextImg() { setImgIdx(prev => (prev + 1) % images.length); }
   function prevImg() { setImgIdx(prev => (prev - 1 + images.length) % images.length); }
+  function onTouchStart(e: React.TouchEvent) { touchStartRef.current = e.touches[0].clientX; }
+  function onTouchMove(e: React.TouchEvent) { touchEndRef.current = e.touches[0].clientX; }
+  function onTouchEnd() {
+    const diff = touchStartRef.current - touchEndRef.current;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) nextImg();
+      else prevImg();
+    }
+  }
 
   function getStock(size: string, color: string) {
     const v = product!.variants.find((vv) => vv.size === size && vv.color === color);
@@ -91,12 +101,12 @@ export default function ProductModal({
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12" /></svg>
         </button>
         <div className="pmodal-grid">
-          <div className="pmodal-img" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
+          <div className="pmodal-img" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
             {images.length > 0 ? (
               <>
-                <div className="gal-stage">
+                <div className="gal-stage" onClick={() => images.length > 1 && nextImg()}>
                   {images.map((img, i) => (
-                    <img key={i} src={img.url} alt={product!.name} className={`gal-slide${i === imgIdx ? " active" : ""}`} />
+                    <img key={i} src={img.url} alt={product!.name} className={`gal-slide${i === imgIdx ? " active" : ""}`} loading="lazy" />
                   ))}
                 </div>
                 {images.length > 1 && (
