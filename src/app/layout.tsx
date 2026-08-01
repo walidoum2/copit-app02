@@ -3,15 +3,16 @@ import "./globals.css";
 import { Providers } from "./providers";
 
 const siteUrl = "https://copit.dz";
+const siteDescription = "Sneakers et streetwear premium, livrés dans les 69 wilayas d'Algérie. Paiement à la livraison.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: "COP IT — Sneakers & Streetwear, Algérie",
-  description: "Sneakers et streetwear 100% originaux, livrés dans les 69 wilayas. Paiement à la livraison.",
+  description: siteDescription,
   icons: { icon: "/favicon.ico" },
   openGraph: {
     title: "COP IT — Sneakers & Streetwear, Algérie",
-    description: "Sneakers et streetwear 100% originaux, livrés dans les 69 wilayas. Paiement à la livraison.",
+    description: siteDescription,
     url: siteUrl,
     siteName: "COP IT DZ",
     locale: "fr_DZ",
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "COP IT — Sneakers & Streetwear, Algérie",
-    description: "Sneakers et streetwear 100% originaux, livrés dans les 69 wilayas. Paiement à la livraison.",
+    description: siteDescription,
     images: ["/logo.png"],
   },
 };
