@@ -272,11 +272,15 @@ export default function HomePage() {
               )) : <span className="hero-line hero-line-highlight">{raw}</span>;
             })()}
           </h1>
-          <p className="hero-premium-sub">{L("hero_subtitle", t("hero_subtitle"))}</p>
-          <div className="hero-premium-actions">
-            <a href="/shop" className="btn-premium-primary">{L("hero_cta1", t("hero_cta1"))}</a>
-            <a href="/shop?promo=true" className="btn-premium-secondary">{L("hero_cta2", t("promo_btn"))}</a>
-          </div>
+          {dataLoaded && (
+            <>
+              <p className="hero-premium-sub">{L("hero_subtitle", t("hero_subtitle"))}</p>
+              <div className="hero-premium-actions">
+                <a href="/shop" className="btn-premium-primary">{L("hero_cta1", t("hero_cta1"))}</a>
+                <a href="/shop?promo=true" className="btn-premium-secondary">{L("hero_cta2", t("promo_btn"))}</a>
+              </div>
+            </>
+          )}
         </div>
       </section>
 
