@@ -46,7 +46,7 @@ a { color: inherit; text-decoration: none; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 
-section { padding: 48px 0 44px; }
+section { padding: 60px 0 44px; }
 
 .wrap { max-width: 1240px; margin: 0 auto; padding: 0 20px; }
 .mono { font-family: 'JetBrains Mono', monospace; }
@@ -255,9 +255,9 @@ section { padding: 48px 0 44px; }
 .cat-card-horizontal:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
 .cat-card-loading { background: var(--bg2); animation: shimmer 1.8s ease-in-out infinite; background-image: linear-gradient(90deg, var(--bg2) 0%, var(--bg3) 50%, var(--bg2) 100%); background-size: 200% 100%; }
 .cat-card-loading .cat-content h3 { color: var(--text-dim); }
-.marquee + section.wrap { padding-top: 72px; }
-@media (max-width: 920px) { .marquee + section.wrap { padding-top: 56px; } }
-@media (max-width: 480px) { .marquee + section.wrap { padding-top: 44px; } }
+.marquee + section.wrap { padding-top: 84px; }
+@media (max-width: 920px) { .marquee + section.wrap { padding-top: 76px; } }
+@media (max-width: 480px) { .marquee + section.wrap { padding-top: 56px; } }
 .cat-card-horizontal .cat-img-wrap { position: absolute; inset: 0; }
 .cat-card-horizontal .cat-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s var(--ease); }
 .cat-card-horizontal:hover .cat-img { transform: scale(1.06); }
@@ -744,7 +744,7 @@ button:focus:not(:focus-visible) { outline: none; }
   .frow { grid-template-columns: 1fr; }
   .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
   .why-grid-premium { grid-template-columns: repeat(2, 1fr); }
-  section { padding: 40px 0 36px; }
+  section { padding: 56px 0 40px; }
   .wrap { padding: 0 16px; }
   .page-head { padding: 32px 0 24px; }
   .header .wrap { padding: 0 12px; }
@@ -807,7 +807,7 @@ button:focus:not(:focus-visible) { outline: none; }
   .section-head-alt h2 { font-size: 22px; }
   .section-head-alt { margin-bottom: 28px; }
   .wrap { padding: 0 12px; }
-  section { padding: 28px 0 26px; }
+  section { padding: 44px 0 32px; }
   .hero-premium { padding: 56px 0 44px; }
   .floating-cart { bottom: 16px; right: 16px; width: 50px; height: 50px; }
   .floating-cart svg { width: 20px; height: 20px; }
@@ -823,7 +823,7 @@ button:focus:not(:focus-visible) { outline: none; }
 
 @media (max-width: 320px) {
   .wrap { padding: 0 8px; }
-  section { padding: 24px 0 22px; }
+  section { padding: 36px 0 28px; }
   .hero-premium { padding: 44px 0 36px; }
 }
 
