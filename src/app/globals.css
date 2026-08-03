@@ -232,6 +232,13 @@ section { padding: 60px 0 44px; }
   transition: opacity 0.2s var(--ease);
 }
 .marquee-content span:hover { opacity: 1; }
+@media (hover: hover) {
+  .marquee:hover .marquee-track { animation-play-state: paused; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation: none; }
+  .marquee { overflow-x: auto; }
+}
 .marquee-dot { color: var(--text-dim); font-size: 10px; opacity: 0.4; }
 @keyframes marqueeScroll {
   0% { transform: translateX(0); }
