@@ -30,7 +30,13 @@ export async function GET(req: NextRequest) {
       default:
         return NextResponse.json({ error: "Invalid type" }, { status: 400 });
     }
-  } catch {
+  } catch (e) {
+    if (req.nextUrl.searchParams.get("debug")) {
+      return NextResponse.json(
+        { error: "Database not available", detail: e instanceof Error ? `${e.name}: ${e.message}` : String(e) },
+        { status: 503 }
+      );
+    }
     return NextResponse.json({ error: "Database not available" }, { status: 503 });
   }
 }
