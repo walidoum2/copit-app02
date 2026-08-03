@@ -51,10 +51,11 @@ export async function POST(request: Request) {
     const apiSecret = process.env.CLOUDINARY_API_SECRET;
 
     if (!cloudName || !apiKey || !apiSecret) {
-      return NextResponse.json(
-        { error: "Cloudinary not configured" },
-        { status: 500 }
-      );
+      return NextResponse.json({
+        success: true,
+        url: dataUrl,
+        storage: "local",
+      });
     }
 
     const timestamp = Math.round(Date.now() / 1000);
@@ -90,6 +91,7 @@ export async function POST(request: Request) {
       success: true,
       url: result.secure_url,
       publicId: result.public_id,
+      storage: "cloudinary",
     });
   } catch {
     return NextResponse.json(

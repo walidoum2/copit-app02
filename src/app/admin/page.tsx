@@ -134,6 +134,9 @@ export default function AdminPage() {
   const [showNewForm, setShowNewForm] = useState(false);
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [prodSearch, setProdSearch] = useState("");
+  const [prodPage, setProdPage] = useState(1);
+  const [orderFilter, setOrderFilter] = useState("all");
 
   function showToast(msg: string) { setToastMsg(msg); setTimeout(() => setToastMsg(""), 2600); }
 
@@ -306,6 +309,18 @@ export default function AdminPage() {
   const pendingCount = orders.filter((o) => o.status === "pending").length;
   const activeWilayas = new Set(orders.map((o) => o.wilaya)).size;
 
+  const ORDER_STATUSES = ["pending", "confirmed", "shipped", "delivered", "cancelled"];
+  const filteredOrders = orderFilter === "all" ? orders : orders.filter(o => o.status === orderFilter);
+
+  const PROD_PAGE_SIZE = 10;
+  const q = prodSearch.trim().toLowerCase();
+  const filteredProducts = [...products]
+    .sort((a, b) => a.position - b.position)
+    .filter(p => !q || p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q));
+  const prodTotalPages = Math.max(1, Math.ceil(filteredProducts.length / PROD_PAGE_SIZE));
+  const curProdPage = Math.min(prodPage, prodTotalPages);
+  const pageProducts = filteredProducts.slice((curProdPage - 1) * PROD_PAGE_SIZE, curProdPage * PROD_PAGE_SIZE);
+
   return (
     <div className="wrap" style={{ paddingBottom: 90 }}>
       <div className="admin-bar">
@@ -329,11 +344,24 @@ export default function AdminPage() {
       </div>
 
       {tab === "orders" && (
-        orders.length === 0 ? <p style={{ color: "var(--steel)" }}>{t("admin_no_orders")}</p> :
+        <>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 16 }}>
+            <button className={`btn btn-sm${orderFilter === "all" ? " btn-primary" : ""}`} style={orderFilter === "all" ? {} : { background: "transparent", border: "1px solid var(--line)", color: "var(--steel)" }} onClick={() => setOrderFilter("all")}>Tous ({orders.length})</button>
+            {ORDER_STATUSES.map(s => {
+              const c = orders.filter(o => o.status === s).length;
+              if (c === 0) return null;
+              return (
+                <button key={s} className={`btn btn-sm${orderFilter === s ? " btn-primary" : ""}`} style={orderFilter === s ? {} : { background: "transparent", border: "1px solid var(--line)", color: "var(--steel)" }} onClick={() => setOrderFilter(s)}>
+                  {s} ({c})
+                </button>
+              );
+            })}
+          </div>
+          {filteredOrders.length === 0 ? <p style={{ color: "var(--steel)" }}>{t("admin_no_orders")}</p> :
         <table>
           <thead><tr><th>Ref</th><th>Client</th><th>Wilaya</th><th>Total</th><th>Status</th><th></th></tr></thead>
           <tbody>
-            {orders.map((o) => (
+            {filteredOrders.map((o) => (
               <>
                 <tr key={o.id} onClick={() => setExpandedOrder(expandedOrder === o.id ? null : o.id)} style={{ cursor: "pointer" }}>
                   <td className="mono">{o.id}</td>
@@ -384,21 +412,34 @@ export default function AdminPage() {
             ))}
           </tbody>
         </table>
+        }
+        </>
       )}
 
       {tab === "products" && (
         <>
-          <div style={{ marginBottom: 16 }}>
+          <div style={{ marginBottom: 16, display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
             <button className="btn btn-primary" onClick={() => { setShowNewForm(!showNewForm); setEditingProduct(null); }}>
               {showNewForm ? "− " + t("admin_cancel") : t("admin_new_product")}
             </button>
+            <input
+              value={prodSearch}
+              onChange={(e) => { setProdSearch(e.target.value); setProdPage(1); }}
+              placeholder="Rechercher (nom, marque, SKU)…"
+              style={{ flex: 1, minWidth: 220, maxWidth: 360, background: "var(--ink)", border: "1px solid var(--line)", color: "var(--bone)", padding: "10px 14px", fontSize: 13, borderRadius: 2 }}
+            />
+            <span className="mono" style={{ fontSize: 11, color: "var(--steel)" }}>{filteredProducts.length} produit{filteredProducts.length > 1 ? "s" : ""}</span>
           </div>
           {showNewForm && <ProductFormInner product={EMPTY_PRODUCT} onSave={saveProduct} onCancel={() => setShowNewForm(false)} showToast={showToast} saving={saving} />}
           {editingProduct && <ProductFormInner product={editingProduct} onSave={saveProduct} onCancel={() => setEditingProduct(null)} showToast={showToast} saving={saving} />}
+          {filteredProducts.length === 0 ? (
+            <p style={{ color: "var(--steel)" }}>Aucun produit trouvé.</p>
+          ) : (
+          <>
           <table>
             <thead><tr><th></th><th>Name</th><th>Brand</th><th>Price</th><th>Stock</th><th>Active</th><th></th></tr></thead>
             <tbody>
-              {[...products].sort((a, b) => a.position - b.position).map((p) => {
+              {pageProducts.map((p) => {
                 const totalStock = p.variants.reduce((a, v) => a + v.stock, 0);
                 return (
                   <tr key={p.id}>
@@ -422,6 +463,15 @@ export default function AdminPage() {
               })}
             </tbody>
           </table>
+          {prodTotalPages > 1 && (
+            <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 16 }}>
+              <button className="btn btn-sm" style={{ background: "transparent", border: "1px solid var(--line)", color: "var(--steel)" }} disabled={curProdPage <= 1} onClick={() => setProdPage(curProdPage - 1)}>← Précédent</button>
+              <span className="mono" style={{ fontSize: 12, color: "var(--steel)" }}>Page {curProdPage} / {prodTotalPages}</span>
+              <button className="btn btn-sm" style={{ background: "transparent", border: "1px solid var(--line)", color: "var(--steel)" }} disabled={curProdPage >= prodTotalPages} onClick={() => setProdPage(curProdPage + 1)}>Suivant →</button>
+            </div>
+          )}
+          </>
+          )}
         </>
       )}
 

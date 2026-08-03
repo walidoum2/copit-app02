@@ -22,10 +22,13 @@ export default function ProductModal({
   const [imgIdx, setImgIdx] = useState(0);
   const [paused, setPaused] = useState(false);
   const [zoomed, setZoomed] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const [dragOff, setDragOff] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lenRef = useRef(0);
-  const touchStartRef = useRef(0);
-  const touchEndRef = useRef(0);
+  const dragStartRef = useRef<{ x: number; idx: number } | null>(null);
+  const dragOffRef = useRef(0);
+  const movedRef = useRef(false);
 
   const images = product?.images || [];
 
@@ -57,14 +60,47 @@ export default function ProductModal({
 
   function nextImg() { setImgIdx(prev => (prev + 1) % images.length); }
   function prevImg() { setImgIdx(prev => (prev - 1 + images.length) % images.length); }
-  function onTouchStart(e: React.TouchEvent) { touchStartRef.current = e.touches[0].clientX; }
-  function onTouchMove(e: React.TouchEvent) { touchEndRef.current = e.touches[0].clientX; }
-  function onTouchEnd() {
-    const diff = touchStartRef.current - touchEndRef.current;
-    if (Math.abs(diff) > 50) {
-      if (diff > 0) nextImg();
-      else prevImg();
+
+  function startDrag(e: React.PointerEvent<HTMLDivElement>) {
+    if (images.length === 0) return;
+    dragStartRef.current = { x: e.clientX, idx: imgIdx };
+    dragOffRef.current = 0;
+    movedRef.current = false;
+    setDragging(true);
+    setPaused(true);
+    e.currentTarget.setPointerCapture(e.pointerId);
+  }
+  function moveDrag(e: React.PointerEvent<HTMLDivElement>) {
+    const s = dragStartRef.current;
+    if (!s || images.length < 2) return;
+    const dx = e.clientX - s.x;
+    if (Math.abs(dx) > 6) movedRef.current = true;
+    dragOffRef.current = dx;
+    setDragOff(dx);
+  }
+  function endDrag() {
+    const s = dragStartRef.current;
+    if (!s) return;
+    dragStartRef.current = null;
+    setDragging(false);
+    setPaused(false);
+    const dx = dragOffRef.current;
+    setDragOff(0);
+    if (images.length < 2) {
+      setZoomed(z => !z);
+      return;
     }
+    if (Math.abs(dx) > 60) {
+      if (dx < 0) nextImg();
+      else prevImg();
+    } else if (!movedRef.current) {
+      setZoomed(z => !z);
+    }
+  }
+  function onStageKey(e: React.KeyboardEvent<HTMLDivElement>) {
+    if (e.key === "ArrowRight") { e.preventDefault(); nextImg(); }
+    else if (e.key === "ArrowLeft") { e.preventDefault(); prevImg(); }
+    else if (e.key === "Escape") onClose();
   }
 
   function getStock(size: string, color: string) {
@@ -103,19 +139,32 @@ export default function ProductModal({
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12" /></svg>
         </button>
         <div className="pmodal-grid">
-          <div className={`pmodal-img${zoomed ? " zoomed" : ""}`} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} onClick={() => setZoomed(!zoomed)} style={{ cursor: zoomed ? "zoom-out" : "zoom-in" }}>
+          <div className={`pmodal-img${zoomed ? " zoomed" : ""}`} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
             {images.length > 0 ? (
               <>
-                <div className="gal-stage">
-                  {images.map((img, i) => (
-                    <img key={i} src={img.url} alt={product!.name} className={`gal-slide${i === imgIdx ? " active" : ""}`} loading="lazy" />
-                  ))}
+                <div
+                  className={`gal-stage${dragging ? " dragging" : ""}`}
+                  tabIndex={0}
+                  role="region"
+                  aria-label={product!.name}
+                  onPointerDown={startDrag}
+                  onPointerMove={moveDrag}
+                  onPointerUp={endDrag}
+                  onPointerCancel={endDrag}
+                  onKeyDown={onStageKey}
+                  onDragStart={(e) => e.preventDefault()}
+                >
+                  <div className="gal-track" style={{ transform: `translateX(${dragOff - imgIdx * 100}%)` }}>
+                    {images.map((img, i) => (
+                      <img key={i} src={img.url} alt={product!.name} className={`gal-slide${i === imgIdx ? " active" : ""}`} loading="lazy" draggable={false} />
+                    ))}
+                  </div>
                 </div>
                 {images.length > 1 && (
                   <>
-                    <button className="gal-arrow gal-arrow-left" onClick={(e) => { e.stopPropagation(); prevImg(); }} aria-label="Previous">‹</button>
-                    <button className="gal-arrow gal-arrow-right" onClick={(e) => { e.stopPropagation(); nextImg(); }} aria-label="Next">›</button>
-                    <div className="gal-dots">
+                    <button className="gal-arrow gal-arrow-left" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); prevImg(); }} aria-label="Previous">‹</button>
+                    <button className="gal-arrow gal-arrow-right" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); nextImg(); }} aria-label="Next">›</button>
+                    <div className="gal-dots" onPointerDown={(e) => e.stopPropagation()}>
                       {images.map((_, i) => (
                         <span key={i} className={`gal-dot${i === imgIdx ? " active" : ""}`} onClick={(e) => { e.stopPropagation(); setImgIdx(i); }} />
                       ))}
