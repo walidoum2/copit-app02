@@ -65,9 +65,10 @@ Content is stored in DB and fetched by the homepage/Footer with hardcoded fallba
 - Admin CRUD: `GET|POST|PUT|DELETE /api/admin/content?type=...`
 
 ## Admin
-- Login: `admin@copit.dz` / `CopIt2026!` (set via `.env`)
+- Login: `admin@copit.dz` / `!Cop123It5879!` (user's real password; do NOT reset unless explicitly asked)
 - JWT auth via cookie (`copit_admin_token`)
 - Admin API routes (`/api/admin/*`) use `getAuthAdmin()` guard
+- Login rate limit: 5 attempts/min per IP (429 "Too many login attempts" after wrong tries)
 
 ## Gotchas
 - `prisma db push` (not migrate) for schema changes
