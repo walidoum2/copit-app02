@@ -10,7 +10,7 @@ import ProductCard, { type ProductData } from "@/components/ProductCard";
 import { useLang } from "@/contexts/LangContext";
 
 function ShopContent() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const params = useSearchParams();
   const [cartOpen, setCartOpen] = useState(false);
   const [products, setProducts] = useState<ProductData[]>([]);
@@ -19,15 +19,31 @@ function ShopContent() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [catLinks, setCatLinks] = useState<{ slug: string; label: string }[]>([]);
 
   const category = params.get("category") || "";
   const promo = params.get("promo") === "true";
+  const brand = params.get("brand") || "";
+
+  useEffect(() => {
+    fetch(`/api/content?type=categories&_t=${Date.now()}`)
+      .then(r => r.json())
+      .then(d => {
+        const cats = (d.categories || [])
+          .filter((c: any) => c.active)
+          .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
+          .map((c: any) => ({ slug: c.slug, label: lang === "ar" ? c.nameAr : c.nameFr }));
+        if (cats.length) setCatLinks(cats);
+      })
+      .catch(() => {});
+  }, [lang]);
 
   useEffect(() => {
     setLoading(true);
     const q = new URLSearchParams({ page: String(page), limit: "12" });
     if (category) q.set("category", category);
     if (promo) q.set("promo", "true");
+    if (brand) q.set("brand", brand);
     fetch(`/api/products?${q}`)
       .then((r) => r.json())
       .then((d) => {
@@ -36,12 +52,14 @@ function ShopContent() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [page, category, promo]);
+  }, [page, category, promo, brand]);
 
   function showToast(msg: string) {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(""), 2600);
   }
+
+  const clearFilters = !category && !brand && !promo;
 
   return (
     <>
@@ -55,8 +73,23 @@ function ShopContent() {
       />
 
       <div className="wrap page-head">
-        <h1 className="text-heading">{promo ? t("promo_title") : t("shop_title")}</h1>
+        <h1 className="text-heading">{promo ? t("promo_title") : brand ? brand : t("shop_title")}</h1>
         {promo && <p>{t("promo_sub")}</p>}
+      </div>
+      <div className="wrap" style={{ padding: "0 0 80px" }}>
+        {catLinks.length > 0 && !promo && !brand && (
+          <div className="shop-chips" style={{ display: "flex", gap: 8, flexWrap: "wrap", padding: "4px 0 28px" }}>
+            <a href="/shop" className={`chip${!category ? " active" : ""}`}>{t("shop_all")}</a>
+            {catLinks.map((c) => (
+              <a key={c.slug} href={`/shop?category=${encodeURIComponent(c.slug)}`} className={`chip${category === c.slug ? " active" : ""}`}>{c.label}</a>
+            ))}
+          </div>
+        )}
+        {!clearFilters && (
+          <div style={{ padding: "0 0 20px" }}>
+            <a href="/shop" className="chip">× Effacer les filtres</a>
+          </div>
+        )}
       </div>
       <div className="wrap" style={{ padding: "36px 0 80px" }}>
         {loading ? (

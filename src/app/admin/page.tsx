@@ -16,13 +16,14 @@ interface Order {
   createdAt: string; procolisId: string | null;
 }
 interface ShippingRate { wilaya: string; homePrice: number; stopPrice: number; days: string; }
-interface Product { id: string; name: string; brand: string; category: string; price: number; originalPrice: number; material: string; sku: string; tag: string; active: boolean; position: number; variants: { id?: string; size: string; color: string; colorHex: string; stock: number }[]; images: { id?: string; url: string; alt?: string }[]; }
+interface Product { id: string; name: string; brand: string; category: string; price: number; originalPrice: number; material: string; sku: string; tag: string; active: boolean; position: number; showOnHomepage: boolean; showInLatestSneakers: boolean; showInMenu: boolean; showInBrandSection: boolean; featured: boolean; homepageSection: string; menuSection: string; brandSection: string; variants: { id?: string; size: string; color: string; colorHex: string; stock: number }[]; images: { id?: string; url: string; alt?: string }[]; }
 
 const DEFAULT_VARIANT = { size: "", color: "", colorHex: "#888888", stock: 0 };
-const CATEGORIES = ["Sneakers", "Vêtements", "Promotions", "Accessoires", "Sacs", "Jordan", "Nike", "Adidas", "Puma", "Converse", "New Balance", "Other"];
-const EMPTY_PRODUCT: Product = { id: "", name: "", brand: "CopIt Basics", category: "Sneakers", price: 0, originalPrice: 0, material: "", sku: "", tag: "", active: true, position: 0, variants: [{ ...DEFAULT_VARIANT }], images: [] };
+const CATEGORIES = ["Sneakers", "Vêtements", "Promotions", "Accessoires", "Sacs", "Other"];
+const BRAND_EXAMPLES = ["Jordan", "Nike", "Adidas", "Puma", "Converse", "New Balance", "Under Armour", "Maison Margiela", "Golden Goose", "Dr. Martens", "Chanel", "Louboutin", "Isabel Marant", "Other", "CopIt Basics"];
+const EMPTY_PRODUCT: Product = { id: "", name: "", brand: "CopIt Basics", category: "Sneakers", price: 0, originalPrice: 0, material: "", sku: "", tag: "", active: true, position: 0, showOnHomepage: true, showInLatestSneakers: true, showInMenu: true, showInBrandSection: true, featured: false, homepageSection: "latest", menuSection: "Sneakers", brandSection: "CopIt Basics", variants: [{ ...DEFAULT_VARIANT }], images: [] };
 
-function ProductFormInner({ product: prod, onSave, onCancel, showToast, saving }: { product: Product; onSave: (p: Product) => void; onCancel: () => void; showToast: (msg: string) => void; saving: boolean }) {
+function ProductFormInner({ product: prod, onSave, onCancel, showToast, saving, categoryOptions }: { product: Product; onSave: (p: Product) => void; onCancel: () => void; showToast: (msg: string) => void; saving: boolean; categoryOptions: string[] }) {
   const { t } = useLang();
   const [form, setForm] = useState<Product>(() => JSON.parse(JSON.stringify(prod)));
 
@@ -75,10 +76,14 @@ function ProductFormInner({ product: prod, onSave, onCancel, showToast, saving }
     <div style={{ background: "var(--ink2)", border: "1px solid var(--line)", borderRadius: 2, padding: 24, margin: "16px 0" }}>
       <div className="frow">
         <div className="field"><label>Name</label><input value={form.name} onChange={e => updateField("name", e.target.value)} /></div>
-        <div className="field"><label>Brand</label><input value={form.brand} onChange={e => updateField("brand", e.target.value)} /></div>
+        <div className="field">
+          <label>Brand</label>
+          <input list="brand-list" value={form.brand} onChange={e => updateField("brand", e.target.value)} placeholder="Choisir ou taper une marque" />
+          <datalist id="brand-list">{BRAND_EXAMPLES.map(b => <option key={b} value={b} />)}</datalist>
+        </div>
       </div>
       <div className="frow">
-        <div className="field"><label>Category</label><select value={form.category} onChange={e => updateField("category", e.target.value)} style={{ background: "var(--bg3)", border: "1px solid var(--line)", color: "var(--text)", padding: "12px 14px", fontSize: 14, borderRadius: "var(--radius-sm)", fontFamily: "inherit", width: "100%" }}>{CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
+        <div className="field"><label>Category</label><select value={form.category} onChange={e => updateField("category", e.target.value)} style={{ background: "var(--bg3)", border: "1px solid var(--line)", color: "var(--text)", padding: "12px 14px", fontSize: 14, borderRadius: "var(--radius-sm)", fontFamily: "inherit", width: "100%" }}>{(categoryOptions.length ? categoryOptions : CATEGORIES).map(c => <option key={c} value={c}>{c}</option>)}</select></div>
         <div className="field"><label>SKU</label><input value={form.sku} onChange={e => updateField("sku", e.target.value)} /></div>
       </div>
       <div className="frow">
@@ -91,6 +96,36 @@ function ProductFormInner({ product: prod, onSave, onCancel, showToast, saving }
       </div>
       <div className="frow">
         <div className="field"><label>Position (display order)</label><input type="number" value={form.position} onChange={e => updateField("position", +e.target.value)} /></div>
+        <div className="field"><label>Active</label><label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13 }}><input type="checkbox" checked={form.active} onChange={e => updateField("active", e.target.checked)} style={{ width: 18, height: 18, accentColor: "var(--text)" }} />{form.active ? "Visible" : "Masqué"}</label></div>
+      </div>
+      <div style={{ marginTop: 16 }}>
+        <label style={{ fontSize: 11, letterSpacing: 1, textTransform: "uppercase", color: "var(--steel)", fontWeight: 700 }}>Affichage & sections</label>
+        <div style={{ display: "flex", gap: 14, flexWrap: "wrap", marginTop: 10 }}>
+          {([
+            { key: "showOnHomepage" as const, label: "Page d'accueil" },
+            { key: "showInLatestSneakers" as const, label: "Dernières Sneakers" },
+            { key: "showInMenu" as const, label: "Menu boutique" },
+            { key: "showInBrandSection" as const, label: "Section marque" },
+            { key: "featured" as const, label: "Vedette (featured)" },
+          ]).map(({ key, label }) => (
+            <label key={key} style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: 13 }}>
+              <input type="checkbox" checked={Boolean(form[key])} onChange={e => updateField(key, e.target.checked)} style={{ width: 17, height: 17, accentColor: "var(--text)" }} />
+              {label}
+            </label>
+          ))}
+        </div>
+      </div>
+      <div className="frow" style={{ marginTop: 16 }}>
+        <div className="field"><label>Section page d'accueil</label><select value={form.homepageSection} onChange={e => updateField("homepageSection", e.target.value)} style={{ background: "var(--bg3)", border: "1px solid var(--line)", color: "var(--text)", padding: "12px 14px", fontSize: 14, borderRadius: "var(--radius-sm)", fontFamily: "inherit", width: "100%" }}><option value="latest">Dernières Sneakers</option><option value="none">Aucune</option></select></div>
+        <div className="field"><label>Section menu</label><select value={form.menuSection} onChange={e => updateField("menuSection", e.target.value)} style={{ background: "var(--bg3)", border: "1px solid var(--line)", color: "var(--text)", padding: "12px 14px", fontSize: 14, borderRadius: "var(--radius-sm)", fontFamily: "inherit", width: "100%" }}>{(categoryOptions.length ? categoryOptions : CATEGORIES).map(c => <option key={c} value={c}>{c}</option>)}</select></div>
+      </div>
+      <div className="frow">
+        <div className="field">
+          <label>Section marque (filtre marque)</label>
+          <input list="brand-section-list" value={form.brandSection} onChange={e => updateField("brandSection", e.target.value)} placeholder="Marque pour la section marque" />
+          <datalist id="brand-section-list">{BRAND_EXAMPLES.map(b => <option key={b} value={b} />)}</datalist>
+        </div>
+        <div className="field" />
       </div>
       <div style={{ marginTop: 16 }}>
         <label style={{ fontSize: 11, letterSpacing: 1, textTransform: "uppercase", color: "var(--steel)", fontWeight: 700 }}>{t("admin_variant")}</label>
@@ -139,6 +174,7 @@ export default function AdminPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [rates, setRates] = useState<ShippingRate[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showNewForm, setShowNewForm] = useState(false);
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
@@ -177,6 +213,12 @@ export default function AdminPage() {
       if (productsRes.ok) {
         const productsData = await productsRes.json();
         setProducts(productsData.products || []);
+      }
+      const catsRes = await fetch("/api/content?type=categories");
+      if (catsRes.ok) {
+        const catsData = await catsRes.json();
+        const slugs = (catsData.categories || []).map((c: any) => c.slug);
+        if (slugs.length) setCategoryOptions(slugs);
       }
     } catch {
       showToast("Database not connected — some features may be limited");
@@ -221,6 +263,14 @@ export default function AdminPage() {
         tag: product.tag || "",
         active: product.active,
         position: product.position,
+        showOnHomepage: product.showOnHomepage,
+        showInLatestSneakers: product.showInLatestSneakers,
+        showInMenu: product.showInMenu,
+        showInBrandSection: product.showInBrandSection,
+        featured: product.featured,
+        homepageSection: product.homepageSection,
+        menuSection: product.menuSection,
+        brandSection: product.brandSection,
         variants: product.variants.map(v => ({ size: v.size, color: v.color, colorHex: v.colorHex, stock: v.stock })),
         images: product.images.map(i => i.url),
       };
@@ -439,8 +489,8 @@ export default function AdminPage() {
             />
             <span className="mono" style={{ fontSize: 11, color: "var(--steel)" }}>{filteredProducts.length} produit{filteredProducts.length > 1 ? "s" : ""}</span>
           </div>
-          {showNewForm && <ProductFormInner product={EMPTY_PRODUCT} onSave={saveProduct} onCancel={() => setShowNewForm(false)} showToast={showToast} saving={saving} />}
-          {editingProduct && <ProductFormInner product={editingProduct} onSave={saveProduct} onCancel={() => setEditingProduct(null)} showToast={showToast} saving={saving} />}
+          {showNewForm && <ProductFormInner product={EMPTY_PRODUCT} onSave={saveProduct} onCancel={() => setShowNewForm(false)} showToast={showToast} saving={saving} categoryOptions={categoryOptions} />}
+          {editingProduct && <ProductFormInner product={editingProduct} onSave={saveProduct} onCancel={() => setEditingProduct(null)} showToast={showToast} saving={saving} categoryOptions={categoryOptions} />}
           {filteredProducts.length === 0 ? (
             <p style={{ color: "var(--steel)" }}>Aucun produit trouvé.</p>
           ) : (

@@ -43,6 +43,14 @@ export const productSchema = z.object({
   tag: z.string().max(100).optional(),
   active: z.boolean().optional(),
   position: z.number().int().min(0).optional(),
+  showOnHomepage: z.boolean().optional(),
+  showInLatestSneakers: z.boolean().optional(),
+  showInMenu: z.boolean().optional(),
+  showInBrandSection: z.boolean().optional(),
+  featured: z.boolean().optional(),
+  homepageSection: z.string().max(50).optional(),
+  menuSection: z.string().max(100).optional(),
+  brandSection: z.string().max(100).optional(),
   variants: z
     .array(
       z.object({

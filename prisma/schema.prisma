@@ -29,6 +29,14 @@ model Product {
   tag         String?
   active      Boolean         @default(true)
   position    Int             @default(0)
+  showOnHomepage Boolean      @default(true)
+  showInLatestSneakers Boolean @default(true)
+  showInMenu  Boolean         @default(true)
+  showInBrandSection Boolean  @default(true)
+  featured    Boolean         @default(false)
+  homepageSection String      @default("latest")
+  menuSection String          @default("")
+  brandSection String         @default("")
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
   variants    ProductVariant[]

@@ -15,6 +15,11 @@ export interface ProductData {
   sku: string;
   tag?: string | null;
   position?: number;
+  featured?: boolean;
+  showOnHomepage?: boolean;
+  showInLatestSneakers?: boolean;
+  showInMenu?: boolean;
+  showInBrandSection?: boolean;
   variants: { id: string; size: string; color: string; colorHex: string; stock: number }[];
   images: { id: string; url: string; alt?: string | null }[];
 }
@@ -55,6 +60,7 @@ export default memo(function ProductCard({ product, onClick }: { product: Produc
   return (
     <div className="pcard">
       <div className="pcard-img" onClick={onClick} style={{ cursor: "pointer" }}>
+        {product.featured && <span className="badge pcard-featured">★</span>}
         {product.tag && <span className="badge pcard-tag">{product.tag}</span>}
         {img && !imgErr ? (
           <img src={optimizeCldUrl(img, { w: 400 })} alt={product.name} loading="lazy" onError={() => setImgErr(true)} />

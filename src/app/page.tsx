@@ -70,7 +70,7 @@ function CategoryCard({ categories, dataLoaded, lang, t, landingSettings }: { ca
       <div className="section-head-alt">
         <h2>{L("cat_title", t("cat_title"))}</h2>
       </div>
-      <a href="/shop?category=Chaussures" className="cat-card-horizontal">
+      <a href={`/shop?category=${encodeURIComponent(cat.slug)}`} className="cat-card-horizontal">
         {imgSrc && !imgFailed ? (
           <div className="cat-img-wrap">
             <img src={optimizeCldUrl(imgSrc, { w: 1000 })} alt="" className="cat-img" loading="lazy" onError={() => setImgFailed(true)} />
@@ -170,6 +170,8 @@ function FAQSection({ faqs: dbFaqs, lang, t, landingSettings }: { faqs: FaqEntry
 
 const HOME_PAGE_SIZE = 10;
 
+const LATEST_SORTS = ["position", "newest", "price_asc", "price_desc"] as const;
+
 export default function HomePage() {
   const [cartOpen, setCartOpen] = useState(false);
   const [products, setProducts] = useState<ProductData[]>([]);
@@ -184,6 +186,9 @@ export default function HomePage() {
   const [categories, setCategories] = useState<any[]>([]);
   const [landingSettings, setLandingSettings] = useState<Record<string, string>>({});
   const [brandNames, setBrandNames] = useState<string[]>([]);
+  const [sneakersSlug, setSneakersSlug] = useState("Sneakers");
+  const [latestLimit, setLatestLimit] = useState(HOME_PAGE_SIZE);
+  const [latestSort, setLatestSort] = useState<string>("position");
   const { t, lang } = useLang();
   const { count } = useCart();
 
@@ -192,31 +197,43 @@ export default function HomePage() {
   useEffect(() => {
     const ts = Date.now();
     Promise.all([
-      fetch(`/api/products?category=Chaussures&page=1&limit=${HOME_PAGE_SIZE}&_t=${ts}`).then(r => r.json()),
       fetch(`/api/content?type=faq&_t=${ts}`).then(r => r.json()),
       fetch(`/api/content?type=whyus&_t=${ts}`).then(r => r.json()),
       fetch(`/api/content?type=categories&_t=${ts}`).then(r => r.json()),
       fetch(`/api/landing?_t=${ts}`).then(r => r.json()),
       fetch(`/api/content?type=brands&_t=${ts}`).then(r => r.json()),
-    ]).then(([prodD, faqD, whyD, catD, landD, brandD]) => {
-      if (prodD.products) {
-        setProducts(prodD.products);
-        setTotalProducts(prodD.pagination?.total || 0);
-      } else setProductsError(true);
+    ]).then(async ([faqD, whyD, catD, landD, brandD]) => {
       if (faqD.faqs?.length) setFaqs(faqD.faqs);
       if (whyD.items?.length) setWhyus(whyD.items);
       if (catD.categories?.length) setCategories(catD.categories);
-      if (landD.settings) setLandingSettings(landD.settings);
+      const settings = landD.settings || {};
+      setLandingSettings(settings);
       if (brandD.brands?.length) setBrandNames(brandD.brands.map((b: any) => b.name));
+
+      const slug = catD.categories?.find((c: any) => c.slug === "Sneakers")?.slug || "Sneakers";
+      setSneakersSlug(slug);
+      const limit = Math.min(100, Math.max(1, parseInt(settings.latestSneakersLimit || "") || HOME_PAGE_SIZE));
+      const sort = (LATEST_SORTS as readonly string[]).includes(settings.latestSneakersSortOrder || "") ? settings.latestSneakersSortOrder : "position";
+      setLatestLimit(limit);
+      setLatestSort(sort);
+
+      try {
+        const res = await fetch(`/api/products?category=${encodeURIComponent(slug)}&page=1&limit=${limit}&latest=1&sort=${sort}&_t=${Date.now()}`);
+        const prodD = await res.json();
+        if (prodD.products) {
+          setProducts(prodD.products);
+          setTotalProducts(prodD.pagination?.total || 0);
+        } else setProductsError(true);
+      } catch { setProductsError(true); }
     }).catch(() => setProductsError(true))
     .finally(() => setDataLoaded(true));
   }, []);
 
   async function loadMore() {
     setLoadingMore(true);
-    const nextPage = Math.floor(products.length / HOME_PAGE_SIZE) + 1;
+    const nextPage = Math.floor(products.length / latestLimit) + 1;
     try {
-      const res = await fetch(`/api/products?category=Chaussures&page=${nextPage}&limit=${HOME_PAGE_SIZE}&_t=${Date.now()}`);
+      const res = await fetch(`/api/products?category=${encodeURIComponent(sneakersSlug)}&page=${nextPage}&limit=${latestLimit}&latest=1&sort=${latestSort}&_t=${Date.now()}`);
       const d = await res.json();
       if (d.products?.length) {
         const existing = new Set(products.map(p => p.id));
@@ -288,42 +305,48 @@ export default function HomePage() {
 
       <CategoryCard categories={categories} dataLoaded={dataLoaded} lang={lang} t={t} landingSettings={landingSettings} />
 
-      <section className="product-section-premium" id="sneakers-section" data-reveal>
-        <div className="wrap">
-          <div className="section-head-alt">
-            <h2>{L("new_title", t("new_title"))}</h2>
-          </div>
-          <div className="grid-products-premium">
-            {!dataLoaded ? (
-              <p style={{ color: "var(--text-dim)", fontSize: 13, gridColumn: "1 / -1", textAlign: "center", padding: 40 }}>
-                <span className="spinner" />
-              </p>
-            ) : productsError ? (
-              <p style={{ color: "var(--text-dim)", fontSize: 13, gridColumn: "1 / -1", textAlign: "center", padding: 40 }}>{t("home_products_error")}</p>
-            ) : products.length === 0 ? (
-              <p style={{ color: "var(--text-dim)", fontSize: 13, gridColumn: "1 / -1", textAlign: "center", padding: 40 }}>
-                {t("home_products_empty")}
-              </p>
-            ) : (
-              [...products].sort((a, b) => (a.position || 0) - (b.position || 0)).map((p) => (
-                <ProductCard key={p.id} product={p} onClick={() => setSelectedProduct(p)} />
-              ))
-            )}
-          </div>
-          {dataLoaded && !productsError && products.length > 0 && (
-            <div style={{ textAlign: "center", marginTop: 48, display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-              {products.length < totalProducts && (
-                <button className="btn-premium-outline" onClick={loadMore} disabled={loadingMore} style={{ border: "none", background: "var(--text)", color: "var(--bg)" }}>
-                  {loadingMore ? "..." : L("btn_voir_plus", t("btn_voir_plus"))}
-                </button>
+      {(() => {
+        const latestEnabled = L("latestSneakersEnabled", "1") !== "0";
+        if (!latestEnabled) return null;
+        return (
+          <section className="product-section-premium" id="sneakers-section" data-reveal>
+            <div className="wrap">
+              <div className="section-head-alt">
+                <h2>{L("new_title", t("new_title"))}</h2>
+              </div>
+              <div className="grid-products-premium">
+                {!dataLoaded ? (
+                  <p style={{ color: "var(--text-dim)", fontSize: 13, gridColumn: "1 / -1", textAlign: "center", padding: 40 }}>
+                    <span className="spinner" />
+                  </p>
+                ) : productsError ? (
+                  <p style={{ color: "var(--text-dim)", fontSize: 13, gridColumn: "1 / -1", textAlign: "center", padding: 40 }}>{t("home_products_error")}</p>
+                ) : products.length === 0 ? (
+                  <p style={{ color: "var(--text-dim)", fontSize: 13, gridColumn: "1 / -1", textAlign: "center", padding: 40 }}>
+                    {t("home_products_empty")}
+                  </p>
+                ) : (
+                  products.map((p) => (
+                    <ProductCard key={p.id} product={p} onClick={() => setSelectedProduct(p)} />
+                  ))
+                )}
+              </div>
+              {dataLoaded && !productsError && products.length > 0 && (
+                <div style={{ textAlign: "center", marginTop: 48, display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+                  {products.length < totalProducts && (
+                    <button className="btn-premium-outline" onClick={loadMore} disabled={loadingMore} style={{ border: "none", background: "var(--text)", color: "var(--bg)" }}>
+                      {loadingMore ? "..." : L("btn_voir_plus", t("btn_voir_plus"))}
+                    </button>
+                  )}
+                  <a href={`/shop?category=${encodeURIComponent(sneakersSlug)}`} className="btn-premium-outline">
+                    {L("btn_tout_voir", t("btn_tout_voir"))}
+                  </a>
+                </div>
               )}
-              <a href="/shop?category=Chaussures" className="btn-premium-outline">
-                {L("btn_tout_voir", t("btn_tout_voir"))}
-              </a>
             </div>
-          )}
-        </div>
-      </section>
+          </section>
+        );
+      })()}
 
       <div className="hz-divider" />
 

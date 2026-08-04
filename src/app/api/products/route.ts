@@ -7,14 +7,25 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
-  const limit = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") || "20")));
+  const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "20")));
   const category = searchParams.get("category");
   const search = searchParams.get("search");
   const promo = searchParams.get("promo");
+  const brand = searchParams.get("brand");
+  const latest = searchParams.get("latest") === "true" || searchParams.get("latest") === "1";
+  const sort = searchParams.get("sort") || "position";
 
   try {
-    const where: Record<string, unknown> = { active: true };
+    const where: Record<string, unknown> = { active: true, showInMenu: true };
     if (category) where.category = category;
+    if (brand) {
+      where.brand = brand;
+      where.showInBrandSection = true;
+    }
+    if (latest) {
+      where.showOnHomepage = true;
+      where.showInLatestSneakers = true;
+    }
     const isPromo = promo === "true";
     if (search) {
       where.OR = [
@@ -23,10 +34,19 @@ export async function GET(request: Request) {
       ];
     }
 
+    const orderBy: Array<{ position?: "asc" | "desc"; createdAt?: "asc" | "desc"; price?: "asc" | "desc" }> =
+      sort === "newest"
+        ? [{ createdAt: "desc" }]
+        : sort === "price_asc"
+          ? [{ price: "asc" }]
+          : sort === "price_desc"
+            ? [{ price: "desc" }]
+            : [{ position: "asc" }, { createdAt: "desc" }];
+
     let allProducts = await prisma.product.findMany({
       where,
       include: { variants: true, images: { orderBy: { order: "asc" } } },
-      orderBy: [{ position: "asc" }, { createdAt: "desc" }],
+      orderBy,
     });
 
     if (isPromo) allProducts = allProducts.filter(p => p.originalPrice > p.price);

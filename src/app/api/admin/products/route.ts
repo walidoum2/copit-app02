@@ -83,6 +83,14 @@ export async function POST(request: Request) {
           tag: data.tag,
           active: data.active ?? true,
           position: data.position ?? 0,
+          showOnHomepage: data.showOnHomepage ?? true,
+          showInLatestSneakers: data.showInLatestSneakers ?? true,
+          showInMenu: data.showInMenu ?? true,
+          showInBrandSection: data.showInBrandSection ?? true,
+          featured: data.featured ?? false,
+          homepageSection: data.homepageSection ?? "latest",
+          menuSection: data.menuSection ?? "",
+          brandSection: data.brandSection ?? "",
         },
       });
 

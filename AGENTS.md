@@ -27,9 +27,9 @@
 ## Homepage structure (top→bottom)
 1. **Promo bar** — reads from `landingSettings["promo_*"]` keys (text, visibility, colors, size, padding). Fully customizable from admin `landing` tab.
 2. **Hero** — "LIKE IT. WANT IT. COP IT." with two CTAs: Voir le Drop + Promos
-3. **Marquee** — CSS-animated brand ticker (NIKE, ADIDAS, ASICS, NB, JORDAN, COPIT, PUMA, CONVERSE). No JS, pure `@keyframes marqueeScroll`. Respects `prefers-reduced-motion`.
+3. **Marquee** — CSS-animated brand ticker (brands from DB `BrandItem`, paused on hover on desktop only, respects `prefers-reduced-motion`). Current brands: Golden Goose, Maison Margiela, DC Shoes, Dr. Martens, Under Armour, Chanel, Louboutin, Isabel Marant.
 4. **CategoryCard** — single large horizontal card for `Chaussures` slug from DB → scrolls to `#sneakers-section`. Shows **nothing** if Chaussures doesn't exist in DB (no fallback categories).
-5. **Dernières Sneakers** — product section anchored at `#sneakers-section`. Fetches `/api/products?limit=4&category=Chaussures`. No "Tout voir" button.
+5. **Dernières Sneakers** — product section anchored at `#sneakers-section`. Fetches `/api/products?category=<sneakersSlug>&latest=1&limit=<N>&sort=<s>` where slug comes from DB categories, and limit/sort/visibility come from landing settings `latestSneakersEnabled` / `latestSneakersLimit` / `latestSneakersSortOrder` (editable in admin → Page d'accueil). Section hidden when `latestSneakersEnabled=0`. Product-level visibility: `showOnHomepage` + `showInLatestSneakers` (both DB, admin toggles) gate inclusion; `position` is the display order (single source of truth for all sections).
 6. **Why Us** — 4 icon cards from DB or fallback.
 7. **FAQ** — accordion from DB or fallback.
 8. **Footer** — logo, phone, social, legal links.
@@ -39,9 +39,9 @@
 - **Source of truth**: `CategoryContent` model in DB with `active`, `slug`, `order`, `imageUrl`, trilingual names
 - **Public API**: `GET /api/content?type=categories` — returns only `active: true` categories
 - **Admin API**: `GET|POST|PUT|DELETE /api/admin/content?type=categories` — full CRUD
-- **Homepage**: finds `slug === "Chaussures"` from API data. If missing or empty, no category renders.
+- **Homepage**: finds `slug === "Sneakers"` from API data (canonical sneakers category; renamed from "Chaussures" — DB data normalized). If missing or empty, no category renders.
 - **No hardcoded fallback** — deleted categories fully disappear.
-- **Navigation** (Header.tsx) nav links are **still hardcoded** — `/shop?category=Chaussures` etc.
+- **Navigation** (Header.tsx) is DB-driven: hamburger is always visible (drawer on mobile, dropdown panel on desktop ≥921px), menu links built from `/api/content?type=categories` (active, ordered by `order`), with VIP/Shipping static links appended. Shop page shows the same DB-driven category chips + supports `?brand=` filtering.
 
 - **Backup at** `C:\Users\TADJER\Documents\New OpenCode Project\copit-app-backup` — restore code by copying `src/`, `prisma/`, config files back
 
@@ -69,11 +69,12 @@ Content is stored in DB and fetched by the homepage/Footer with hardcoded fallba
 - JWT auth via cookie (`copit_admin_token`)
 - Admin API routes (`/api/admin/*`) use `getAuthAdmin()` guard
 - Login rate limit: 5 attempts/min per IP (429 "Too many login attempts" after wrong tries)
+- Product form: brand selector (datalist: Jordan, Nike, Adidas, Puma, Converse, New Balance, Under Armour, Maison Margiela, Golden Goose, Dr. Martens, Chanel, Louboutin, Isabel Marant, Other, CopIt Basics), category/menuSection selects from DB categories, visibility toggles (showOnHomepage, showInLatestSneakers, showInMenu, showInBrandSection, featured), homepageSection/menuSection/brandSection placement fields, Active toggle
 
 ## Gotchas
 - `prisma db push` (not migrate) for schema changes
 - Pooled Neon connection: `DATABASE_URL` uses `-pooler` hostname + `?pgbouncer=true` for Prisma; `DIRECT_DATABASE_URL` (no pooler) for migrations
 - Content API under `/api/admin/content` requires auth for POST/PUT/DELETE; `/api/content` is public read-only
 - Procolis/ZR Express API key is invalid (`"Clé non détectée S2"`) — user must contact ZR Express to activate
-- Cloudinary keys are placeholders — not configured
+- Cloudinary keys are configured and working (real keys in .env; client-side compression in `src/lib/imageCompress.ts`; upload rate limit 60/min)
 - `.env` contains real DB creds — do not commit

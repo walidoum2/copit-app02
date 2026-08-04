@@ -29,12 +29,37 @@ const NAV_ICONS: Record<string, JSX.Element> = {
   shipping: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><rect x="1" y="3" width="15" height="13" rx="1" /><path d="M16 8h4l3 3v5h-7V8z" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" /></svg>,
 };
 
+function iconFor(slug: string): JSX.Element {
+  const s = slug.toLowerCase();
+  if (s.includes("chauss") || s.includes("sneaker") || s.includes("chaus")) return NAV_ICONS.sneakers;
+  if (s.includes("vêt") || s.includes("vet") || s.includes("cloth") || s.includes("hood") || s.includes("t-shirt")) return NAV_ICONS.clothes;
+  if (s.includes("access") || s.includes("sac") || s.includes("bag") || s.includes("accessoire")) return NAV_ICONS.accessories;
+  return NAV_ICONS.sneakers;
+}
+
 export default function Header({ onCartOpen }: { onCartOpen: () => void }) {
   const { lang, setLang, t } = useLang();
   const { count } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
   const [logoErr, setLogoErr] = useState(false);
   const [clockStr, setClockStr] = useState("13:56");
+  const [catLinks, setCatLinks] = useState<{ slug: string; label: string }[]>([]);
+
+  useEffect(() => {
+    fetch(`/api/content?type=categories&_t=${Date.now()}`)
+      .then(r => r.json())
+      .then(d => {
+        const cats = (d.categories || [])
+          .filter((c: any) => c.active)
+          .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
+          .map((c: any) => ({
+            slug: c.slug,
+            label: lang === "ar" ? c.nameAr : c.nameFr,
+          }));
+        if (cats.length) setCatLinks(cats);
+      })
+      .catch(() => {});
+  }, [lang]);
 
   useEffect(() => {
     const now = new Date();
@@ -62,10 +87,14 @@ export default function Header({ onCartOpen }: { onCartOpen: () => void }) {
     };
   }, [menuOpen]);
 
+  const fallbackCats = [
+    { slug: "Sneakers", label: t("nav_sneakers") },
+    { slug: "Vêtements", label: t("nav_clothes") },
+    { slug: "Accessoires", label: t("nav_accessories") },
+  ];
+  const menuCats = catLinks.length ? catLinks : fallbackCats;
   const navLinks = [
-    { href: "/shop?category=Chaussures", label: t("nav_sneakers"), key: "sneakers" },
-    { href: "/shop?category=Vêtements", label: t("nav_clothes"), key: "clothes" },
-    { href: "/shop?category=Accessoires", label: t("nav_accessories"), key: "accessories" },
+    ...menuCats.map((c) => ({ href: `/shop?category=${encodeURIComponent(c.slug)}`, label: c.label, key: c.slug })),
     { href: "/vip", label: t("nav_vip"), key: "vip" },
     { href: "/shipping", label: t("nav_shipping"), key: "shipping" },
   ];
@@ -125,7 +154,7 @@ export default function Header({ onCartOpen }: { onCartOpen: () => void }) {
       <div className={`mobile-nav${menuOpen ? " open" : ""}`}>
         {navLinks.map((l) => (
           <Link key={l.key} href={l.href} onClick={() => setMenuOpen(false)}>
-            {NAV_ICONS[l.key]}
+            {NAV_ICONS[l.key] || iconFor(l.key)}
             {l.label}
           </Link>
         ))}

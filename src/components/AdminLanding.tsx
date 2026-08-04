@@ -74,6 +74,7 @@ export default function AdminLanding() {
   }
 
   const promoVisible = settings.promo_visible !== "0";
+  const latestEnabled = settings.latestSneakersEnabled !== "0";
 
   const allFields: { key: string; label: string; type?: string }[] = [
     { key: "promo_text", label: "Bandeau promo - Texte" },
@@ -102,6 +103,9 @@ export default function AdminLanding() {
     { key: "cat_title", label: "Shop par catégorie - Titre" },
     { key: "cat_cta", label: "Carte catégorie - Bouton (ex: Le Shop)" },
     { key: "new_title", label: "Produits - Titre (Dernières Sneakers)" },
+    { key: "latestSneakersEnabled", label: "Dernières Sneakers - Visible" },
+    { key: "latestSneakersLimit", label: "Dernières Sneakers - Nombre max affiché" },
+    { key: "latestSneakersSortOrder", label: "Dernières Sneakers - Tri (position/newest/price_asc/price_desc)" },
     { key: "why_title", label: "Pourquoi nous - Titre" },
     { key: "why_badge", label: "Pourquoi nous - Badge (Authenticité vérifiée)" },
     { key: "faq_title", label: "FAQ - Titre" },
@@ -130,6 +134,18 @@ export default function AdminLanding() {
                   <input type="checkbox" checked={promoVisible} onChange={e => update("promo_visible", e.target.checked ? "1" : "0")} style={{ width: 18, height: 18, accentColor: "var(--text)" }} />
                   {promoVisible ? "Visible sur le site" : "Masqué"}
                 </label>
+              ) : key === "latestSneakersEnabled" ? (
+                <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13 }}>
+                  <input type="checkbox" checked={latestEnabled} onChange={e => update("latestSneakersEnabled", e.target.checked ? "1" : "0")} style={{ width: 18, height: 18, accentColor: "var(--text)" }} />
+                  {latestEnabled ? "Visible sur le site" : "Masqué"}
+                </label>
+              ) : key === "latestSneakersSortOrder" ? (
+                <select value={settings[key] || "position"} onChange={e => update(key, e.target.value)} style={{ flex: 1, background: "var(--bg3)", border: "1px solid var(--line)", color: "var(--text)", padding: "10px 12px", fontSize: 13, borderRadius: 2, fontFamily: "inherit" }}>
+                  <option value="position">Position (ordre admin)</option>
+                  <option value="newest">Nouveautés (derniers ajoutés)</option>
+                  <option value="price_asc">Prix croissant</option>
+                  <option value="price_desc">Prix décroissant</option>
+                </select>
               ) : type === "color" ? (
                 <div style={{ display: "flex", gap: 8, alignItems: "center", flex: 1 }}>
                   <input type="color" value={settings[key] || "#ffffff"} onChange={e => update(key, e.target.value)} style={{ width: 40, height: 36, padding: 0, border: "1px solid var(--line)", borderRadius: 4, cursor: "pointer", background: "none" }} />
