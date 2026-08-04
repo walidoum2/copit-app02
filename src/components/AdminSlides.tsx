@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useLang } from "@/contexts/LangContext";
+import { compressImageFile } from "@/lib/imageCompress";
 
 interface Slide {
   id?: string;
@@ -59,11 +60,12 @@ function SlideEditor({ item, onSave, onCancel }: { item: Slide; onSave: (i: Slid
     if (!file) return;
     e.target.value = "";
     try {
+      const processed = await compressImageFile(file);
       const fd = new FormData();
-      fd.append("file", file);
+      fd.append("file", processed ? processed.blob : file, processed ? processed.name : file.name);
       const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) return;
-      const data = await res.json();
       if (data.url) addImage(data.url);
     } catch {}
   }

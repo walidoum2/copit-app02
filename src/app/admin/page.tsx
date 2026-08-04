@@ -5,6 +5,7 @@ import { useLang } from "@/contexts/LangContext";
 import AdminContent from "@/components/AdminContent";
 import AdminSlides from "@/components/AdminSlides";
 import AdminLanding from "@/components/AdminLanding";
+import { compressImageFile } from "@/lib/imageCompress";
 
 function money(n: number) { return n.toLocaleString("fr-FR") + " DA"; }
 
@@ -50,11 +51,19 @@ function ProductFormInner({ product: prod, onSave, onCancel, showToast, saving }
     if (!file) return;
     e.target.value = "";
     try {
+      const processed = await compressImageFile(file);
       const fd = new FormData();
-      fd.append("file", file);
+      fd.append("file", processed ? processed.blob : file, processed ? processed.name : file.name);
       const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-      if (!res.ok) { showToast("Upload failed"); return; }
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 401) {
+        showToast("Session expirée — reconnectez-vous");
+        return;
+      }
+      if (!res.ok) {
+        showToast(data.error || "Upload failed");
+        return;
+      }
       if (data.url) addImage(data.url);
       else showToast("Upload failed");
     } catch { showToast("Upload failed"); }

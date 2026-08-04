@@ -12,8 +12,8 @@ export async function POST(request: Request) {
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
     || request.headers.get("x-real-ip")
     || "unknown";
-  if (!rateLimit(`upload:${ip}`, 10, 60000)) {
-    return NextResponse.json({ error: "Too many uploads" }, { status: 429 });
+  if (!rateLimit(`upload:${ip}`, 60, 60000)) {
+    return NextResponse.json({ error: "Too many uploads. Try again in a minute." }, { status: 429 });
   }
 
   try {
@@ -79,10 +79,13 @@ export async function POST(request: Request) {
     );
 
     if (!uploadResponse.ok) {
-      return NextResponse.json(
-        { error: "Upload failed" },
-        { status: 500 }
-      );
+      const detail = await uploadResponse.text().catch(() => "");
+      let message = "Cloudinary upload failed";
+      try {
+        const parsed = JSON.parse(detail);
+        if (parsed?.error?.message) message = `Cloudinary: ${parsed.error.message}`;
+      } catch {}
+      return NextResponse.json({ error: message }, { status: 502 });
     }
 
     const result = await uploadResponse.json();
